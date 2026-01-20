@@ -1,0 +1,12 @@
+spectral_bandwidth_mean
+mfcc_3_mean
+spectral_contrast_mean
+mfcc_9_std
+mfcc_6_std
+mfcc_13_std
+mfcc_13_mean
+mfcc_12_std
+mfcc_5_std
+rms_std
+mfcc_17_std
+mfcc_11_std

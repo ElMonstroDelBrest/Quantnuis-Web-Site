@@ -1,0 +1,37 @@
+# ==============================================================================
+# DOCKERFILE - DÉVELOPPEMENT LOCAL
+# ==============================================================================
+# Image pour le développement local avec rechargement automatique
+# ==============================================================================
+
+FROM python:3.11-slim
+
+# Installer les dépendances système pour l'audio et la compilation
+RUN apt-get update && apt-get install -y \
+    ffmpeg \
+    libsndfile1 \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copier les requirements
+COPY requirements.txt .
+
+# Installer les dépendances Python
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Copier le code source
+COPY . .
+
+# Variables d'environnement
+ENV PYTHONUNBUFFERED=1
+ENV NUMBA_CACHE_DIR=/tmp
+ENV MPLCONFIGDIR=/tmp
+
+# Port exposé
+EXPOSE 8000
+
+# Commande de démarrage avec rechargement automatique
+CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]

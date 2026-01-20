@@ -1,0 +1,30 @@
+# ==============================================================================
+# DOCKER COMPOSE - DÉVELOPPEMENT LOCAL
+# ==============================================================================
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8000:8000"
+    volumes:
+      # Monter le code source pour le rechargement automatique
+      - ./config:/app/config
+      - ./shared:/app/shared
+      - ./models:/app/models
+      - ./database:/app/database
+      - ./pipeline:/app/pipeline
+      - ./api:/app/api
+      - ./data:/app/data
+      # Volume pour la base de données (dossier)
+      - db_data:/app/db
+    environment:
+      - DEBUG=true
+      - PYTHONUNBUFFERED=1
+      - DATABASE_PATH=/app/db/quantnuis.db
+    restart: unless-stopped
+
+volumes:
+  db_data:

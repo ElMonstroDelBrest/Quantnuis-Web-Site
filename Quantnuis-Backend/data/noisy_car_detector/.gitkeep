@@ -1,0 +1,4 @@
+# Ce dossier contiendra les données pour le modèle de voiture bruyante :
+# - slices/         : Fichiers audio .wav (uniquement avec voiture !)
+# - annotation.csv  : Annotations (nfile, label: 0=normal, 1=bruyant)
+# - features.csv    : Features extraites (généré automatiquement)

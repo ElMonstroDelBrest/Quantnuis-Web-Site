@@ -1,0 +1,4 @@
+# Ce dossier contiendra les artifacts du modèle après entraînement :
+# - model.h5     : Le modèle TensorFlow
+# - scaler.pkl   : Le StandardScaler
+# - features.txt : La liste des features utilisées

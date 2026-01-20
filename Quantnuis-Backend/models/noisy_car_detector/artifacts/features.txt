@@ -1,0 +1,12 @@
+mfcc_2_mean
+mfcc_9_std
+spectral_bandwidth_mean
+mfcc_28_std
+mfcc_10_std
+mfcc_17_mean
+spectral_centroid_std
+mfcc_12_mean
+rms_std
+spectral_rolloff_mean
+mfcc_20_mean
+mfcc_34_std

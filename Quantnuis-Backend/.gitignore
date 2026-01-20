@@ -1,0 +1,73 @@
+# ==============================================================================
+# QUANTNUIS - GITIGNORE
+# ==============================================================================
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# --- Environnement virtuel ---
+venv/
+ENV/
+env/
+.venv/
+
+# --- IDE ---
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# --- Données ---
+data/car_detector/slices/
+data/car_detector/features.csv
+data/noisy_car_detector/slices/
+data/noisy_car_detector/features.csv
+*.db
+
+# --- Artifacts des modèles ---
+# Les modèles entraînés (trop lourds pour git)
+models/car_detector/artifacts/*.h5
+models/car_detector/artifacts/*.pkl
+models/noisy_car_detector/artifacts/*.h5
+models/noisy_car_detector/artifacts/*.pkl
+
+# --- Logs et cache ---
+*.log
+.cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+
+# --- Tmp ---
+tmp/
+/tmp/
+
+# --- Docker ---
+.docker/
+
+# --- Jupyter ---
+.ipynb_checkpoints/

@@ -1,0 +1,4 @@
+# Ce dossier contiendra les données pour le modèle de détection voiture :
+# - slices/         : Fichiers audio .wav
+# - annotation.csv  : Annotations (nfile, label: 0=pas voiture, 1=voiture)
+# - features.csv    : Features extraites (généré automatiquement)
