@@ -1,0 +1,1403 @@
+\documentclass[11pt,a4paper]{article}
+
+% ─── Packages ───────────────────────────────────────────────────────────────
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage[top=2.5cm,bottom=2.5cm,left=2.5cm,right=2.5cm]{geometry}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{mdframed}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{multirow}
+
+% ─── Couleurs ────────────────────────────────────────────────────────────────
+\definecolor{codebg}{HTML}{1E1E1E}
+\definecolor{codetext}{HTML}{D4D4D4}
+\definecolor{codekw}{HTML}{569CD6}
+\definecolor{codestr}{HTML}{CE9178}
+\definecolor{codecom}{HTML}{6A9955}
+\definecolor{codepunct}{HTML}{D4D4D4}
+\definecolor{codenum}{HTML}{B5CEA8}
+\definecolor{alertbg}{HTML}{FFF3CD}
+\definecolor{alertborder}{HTML}{FFC107}
+\definecolor{successbg}{HTML}{D4EDDA}
+\definecolor{infobg}{HTML}{D1ECF1}
+\definecolor{dangertext}{HTML}{C0392B}
+\definecolor{sectioncolor}{HTML}{2C3E50}
+\definecolor{accentcolor}{HTML}{2980B9}
+
+% ─── Listings ────────────────────────────────────────────────────────────────
+\lstdefinestyle{dark}{
+    backgroundcolor=\color{codebg},
+    basicstyle=\ttfamily\footnotesize\color{codetext},
+    keywordstyle=\color{codekw}\bfseries,
+    stringstyle=\color{codestr},
+    commentstyle=\color{codecom}\itshape,
+    numberstyle=\tiny\color{gray},
+    breaklines=true,
+    breakatwhitespace=true,
+    frame=single,
+    framerule=0.5pt,
+    rulecolor=\color{gray!40},
+    numbers=left,
+    numbersep=6pt,
+    showstringspaces=false,
+    tabsize=4,
+    xleftmargin=1.5em,
+    framexleftmargin=1.5em,
+    literate=
+      {é}{{\'e}}1 {è}{{\`e}}1 {ê}{{\^e}}1 {ë}{{\"e}}1
+      {à}{{\`a}}1 {â}{{\^a}}1 {ä}{{\"a}}1
+      {ç}{{\c{c}}}1 {ù}{{\`u}}1 {û}{{\^u}}1
+      {î}{{\^i}}1 {ï}{{\"i}}1
+      {ô}{{\^o}}1 {œ}{{\oe}}1
+      {É}{{\'E}}1 {È}{{\`E}}1 {À}{{\`A}}1 {Ç}{{\c{C}}}1
+      {→}{{$\rightarrow$}}2
+      {←}{{$\leftarrow$}}2
+      {↓}{{$\downarrow$}}2
+      {↑}{{$\uparrow$}}2
+      {≥}{{$\geq$}}1 {≤}{{$\leq$}}1 {≠}{{$\neq$}}1
+      {×}{{$\times$}}1
+}
+
+\lstdefinestyle{tree}{
+    backgroundcolor=\color{gray!5},
+    basicstyle=\ttfamily\scriptsize,
+    breaklines=true,
+    frame=single,
+    framerule=0.5pt,
+    rulecolor=\color{gray!40},
+    numbers=none,
+    showstringspaces=false,
+}
+
+\lstset{style=dark}
+
+% ─── Hyperref ────────────────────────────────────────────────────────────────
+\hypersetup{
+    colorlinks=true,
+    linkcolor=accentcolor,
+    urlcolor=accentcolor,
+    citecolor=accentcolor,
+    pdftitle={Rapport Technique Complet — Quantnuis Backend},
+    pdfauthor={Équipe agents IA},
+    pdfsubject={Architecture, Modèles IA, API, Déploiement},
+    bookmarksnumbered=true
+}
+
+% ─── Headers ─────────────────────────────────────────────────────────────────
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textcolor{gray}{Quantnuis Backend — Rapport Technique}}
+\fancyhead[R]{\small\textcolor{gray}{\leftmark}}
+\fancyfoot[C]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ─── Sections style ──────────────────────────────────────────────────────────
+\titleformat{\section}
+  {\Large\bfseries\color{sectioncolor}}
+  {\thesection.}{0.8em}{}[\titlerule]
+\titleformat{\subsection}
+  {\large\bfseries\color{accentcolor}}
+  {\thesubsection.}{0.6em}{}
+\titleformat{\subsubsection}
+  {\normalsize\bfseries}
+  {\thesubsubsection.}{0.5em}{}
+
+% ─── Boîtes d'alerte ─────────────────────────────────────────────────────────
+\newmdenv[backgroundcolor=alertbg,linecolor=alertborder,linewidth=2pt,
+          leftline=true,topline=false,bottomline=false,rightline=false,
+          innerleftmargin=10pt,innerrightmargin=10pt]{warningbox}
+\newmdenv[backgroundcolor=successbg,linecolor=green!50!black,linewidth=2pt,
+          leftline=true,topline=false,bottomline=false,rightline=false,
+          innerleftmargin=10pt,innerrightmargin=10pt]{successbox}
+\newmdenv[backgroundcolor=infobg,linecolor=accentcolor,linewidth=2pt,
+          leftline=true,topline=false,bottomline=false,rightline=false,
+          innerleftmargin=10pt,innerrightmargin=10pt]{infobox}
+
+% ─── Macros ──────────────────────────────────────────────────────────────────
+\newcommand{\code}[1]{\texttt{\small #1}}
+\newcommand{\critical}[1]{\textcolor{dangertext}{\textbf{#1}}}
+\newcommand{\ok}[1]{\textcolor{green!50!black}{\textbf{#1}}}
+\newcommand{\warn}[1]{\textcolor{orange!70!black}{\textbf{#1}}}
+
+% ═══════════════════════════════════════════════════════════════════════════
+\begin{document}
+
+% ─── Page de titre ───────────────────────────────────────────────────────────
+\begin{titlepage}
+  \centering
+  \vspace*{3cm}
+
+  {\fontsize{36}{44}\selectfont\bfseries\color{sectioncolor} QUANTNUIS}\\[0.4cm]
+  {\fontsize{22}{28}\selectfont\color{accentcolor} Rapport Technique Complet}\\[2cm]
+
+  \begin{mdframed}[backgroundcolor=gray!8,linecolor=accentcolor,linewidth=1pt]
+    \centering\large
+    Architecture · Modèles IA · Pipeline Audio\\
+    API · Déploiement · Base de données · Sécurité
+  \end{mdframed}
+
+  \vspace{2cm}
+
+  \begin{tabular}{rl}
+    \textbf{Date} & 2026-03-10 \\[4pt]
+    \textbf{Généré par} & Équipe de 5 agents d'analyse parallèles \\[4pt]
+    \textbf{Modèles couverts} & CarDetector (CRNN) + NoisyCarDetector (CNN) \\[4pt]
+    \textbf{Infrastructure} & AWS Lambda + EC2 + S3 + ECR + CodeBuild \\
+  \end{tabular}
+
+  \vfill
+  {\small\color{gray} Confidentiel — Usage interne}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+% ═══════════════════════════════════════════════════════════════════════════
+\section{Vue d'ensemble}
+
+Quantnuis-Backend est un système de \textbf{détection de véhicules bruyants} dans des
+fichiers audio, reposant sur un \textbf{pipeline en cascade à deux modèles IA}.
+
+\subsection{Architecture générale}
+
+\begin{lstlisting}[style=tree,caption={Pipeline de détection en cascade}]
+Audio (WAV / MP3 / OGG / FLAC / M4A)
+    |
+[CarDetector]   --  Détecte la présence d'un véhicule (CRNN ou MLP fallback)
+    |
+    +-- label = PAS_VOITURE  -->  fin (résultat final)
+    |
+    `-- label = VOITURE
+              |
+          [NoisyCarDetector]  --  Classifie le véhicule (CNN ou MLP fallback)
+              |
+              +-- label = NORMAL   -->  "Voiture normale  (~65 dB)"
+              `-- label = BRUYANT  -->  "Voiture bruyante (~95 dB)"
+\end{lstlisting}
+
+\subsection{Déploiement bifurqué}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Composant} & \textbf{Infrastructure} & \textbf{Rôle} & \textbf{Entry point} \\
+\midrule
+Lambda API & AWS Lambda + ECR & \code{/predict} stateless & \code{api.lambda\_api.main.handler} \\
+EC2 API & EC2 t3.micro eu-west-3 & Auth, admin, BDD, S3 & \code{api.ec2\_api.main:app} \\
+Dev local & Machine locale & Wrapper combiné & \code{api.main:app} \\
+\bottomrule
+\end{tabular}
+\caption{Déploiement bifurqué Lambda / EC2}
+\end{table}
+
+\subsection{Stack technique}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{@{}lp{10cm}@{}}
+\toprule
+\textbf{Couche} & \textbf{Technologie} \\
+\midrule
+ML & TensorFlow 2.15, scikit-learn $\geq$1.3, imbalanced-learn \\
+Audio & librosa $\geq$0.10, soundfile, scipy.signal \\
+API & FastAPI, Uvicorn, Mangum (Lambda adapter) \\
+BDD & SQLAlchemy, SQLite (local/Lambda), PostgreSQL (EC2 prod) \\
+Auth & JWT HS256 (python-jose), bcrypt (passlib) \\
+Cloud & AWS Lambda, EC2, S3, ECR, CodeBuild \\
+Container & Docker (3 Dockerfiles), docker-compose \\
+Python & 3.11 strict — TF 2.15 incompatible 3.12 \\
+NumPy & $<2.0$ — contrainte TF 2.15 \\
+\bottomrule
+\end{tabular}
+\caption{Stack technique}
+\end{table}
+
+% ═══════════════════════════════════════════════════════════════════════════
+\section{Arborescence complète du projet}
+
+\begin{lstlisting}[style=tree,caption={Arborescence Quantnuis-Backend (~20 GB)}]
+Quantnuis-Backend/
+|-- api/
+|   |-- main.py                     <- Dev wrapper (hardcodé dans Dockerfiles)
+|   |-- ec2_api/                    <- API stateful (auth, admin, BDD)
+|   |   |-- main.py
+|   |   |-- dependencies.py         <- bcrypt, JWT, dépendances FastAPI
+|   |   |-- github_integration.py   <- Push annotations -> GitHub
+|   |   `-- routers/
+|   |       |-- auth.py             <- /register, /token, /users/me
+|   |       |-- user_data.py        <- /stats, /history, /analysis-results
+|   |       |-- annotations.py      <- /annotation-requests
+|   |       |-- admin.py            <- /admin/*
+|   |       |-- s3_audio.py         <- /s3-audio/*
+|   |       `-- audio_reviews.py    <- /audio-reviews/*
+|   `-- lambda_api/                 <- API stateless (inférence seule)
+|       |-- main.py                 <- Cold start + S3 download + Mangum
+|       `-- routers/
+|           `-- predict.py          <- /predict, /predict/detailed, /health
+|
+|-- config/
+|   `-- settings.py                 <- Singleton @lru_cache, env-aware
+|
+|-- shared/                         <- Utilitaires runtime
+|   |-- audio_utils.py              <- load_audio, extract_*_features, load_melspectrogram
+|   |-- feature_selection.py        <- Pearson + dédoublonnage (threshold=0.90)
+|   |-- logger.py                   <- print_header/success/info/warning/error
+|   `-- colors.py                   <- Codes ANSI
+|
+|-- models/
+|   |-- base_model.py               <- Classe abstraite BaseMLModel
+|   |-- car_detector/               <- NE PAS MODIFIER (collègue)
+|   |   |-- model.py                <- Chargement dual CRNN -> MLP fallback
+|   |   |-- train_crnn.py           <- Entraînement CRNN (355 lignes)
+|   |   |-- train.py                <- Entraînement MLP
+|   |   `-- artifacts/
+|   |       |-- crnn_car_detector.h5  <- CRNN ~1.6 MB
+|   |       |-- crnn_config.json      <- Params mel + stats norm (369 B)
+|   |       |-- model.h5              <- MLP fallback ~200 KB
+|   |       |-- scaler.pkl            <- StandardScaler ~2 KB
+|   |       `-- features.txt          <- 12 noms de features
+|   `-- noisy_car_detector/         <- Modèle de Daniel
+|       |-- model.py                <- Chargement dual CNN -> MLP fallback
+|       |-- train.py
+|       |-- optimize.py
+|       `-- artifacts/
+|           |-- cnn_noisy_car.h5      <- CNN primary, F1=0.994
+|           |-- cnn_config.json
+|           |-- model.h5              <- MLP fallback 67 KB
+|           |-- scaler.pkl            <- 903 bytes
+|           `-- features.txt
+|
+|-- pipeline/
+|   `-- orchestrator.py             <- Cascade + PipelineResult dataclass
+|
+|-- database/
+|   |-- connection.py               <- SQLAlchemy engine + sessionmaker
+|   |-- models.py                   <- ORM: User, CarDetection, NoisyCarAnalysis...
+|   |-- schemas.py                  <- Pydantic schemas API
+|   |-- s3_manager.py               <- Backup BDD -> S3
+|   `-- s3_audio_manager.py
+|
+|-- data/
+|   |-- car_detector/               <- ~7.5 GB
+|   |   |-- slices/                 <- Fichiers audio .wav
+|   |   |-- annotation.csv          <- 28 844 samples
+|   |   |-- features_all.csv        <- ~390 samples x ~182 features
+|   |   |-- features_optimized.csv
+|   |   `-- feature_importance.csv  <- 227 features + scores RF
+|   `-- noisy_car_detector/         <- ~7.5 GB
+|       |-- slices/
+|       |-- annotation.csv          <- 49 607 samples
+|       |-- features_all.csv        <- ~526 samples x ~225 features
+|       `-- feature_importance.csv
+|
+|-- scripts/                        <- Scripts standalone
+|   |-- benchmark.py                <- 10 modèles sklearn CV 5-fold
+|   |-- benchmark_cnn.py            <- CNN vs sklearn
+|   |-- test_pipeline.py            <- Évaluation 4 cas
+|   |-- report_pipeline.py          <- 8 graphiques (706 lignes)
+|   |-- scrape_freesound.py         <- API Freesound v2
+|   |-- scrape_youtube.py           <- yt-dlp
+|   |-- extract_features_parallel.py <- 16 workers ProcessPoolExecutor
+|   |-- data_mining.py              <- RF confiance-based mining
+|   |-- active_learning.py          <- Uncertainty sampling
+|   |-- migrate_sqlite_to_postgres.py
+|   `-- datarmor/                   <- Versions HPC IFREMER
+|
+|-- docs/                           <- Documentation
+|-- quantnuis_cli.py                <- CLI interactive
+|-- Dockerfile.lambda               <- Production Lambda (ECR)
+|-- Dockerfile.dev                  <- Développement local
+|-- buildspec.yml                   <- AWS CodeBuild (racine — requis)
+`-- deploy_lambda.sh                <- One-command deploy
+\end{lstlisting}
+
+% ═══════════════════════════════════════════════════════════════════════════
+\section{Pipeline de données audio}
+
+\subsection{Fonctions \texttt{shared/audio\_utils.py}}
+
+\subsubsection{\texttt{load\_audio(file\_path, sr=None)}}
+
+\begin{itemize}
+  \item Utilise \code{librosa.load()} avec backend ffmpeg
+  \item \code{sr=None} $\Rightarrow$ \code{settings.SAMPLE\_RATE = 22050 Hz}
+  \item Conversion mono automatique (stéréo $\rightarrow$ mono)
+  \item Rééchantillonnage automatique si SR source $\neq$ SR cible
+  \item Retourne \code{float32}, range typique $[-1, 1]$
+  \item \critical{Pas de fallback} — exception propagée si fichier invalide
+\end{itemize}
+
+\subsubsection{\texttt{normalize\_audio(y)}}
+
+\begin{lstlisting}[language=Python,caption={Normalisation L-infini}]
+y_norm = librosa.util.normalize(y)
+# Formule: y_norm = y / (eps + max(|y|))   avec eps ~ 1e-10
+# Range sortie: [-1.0, 1.0]
+\end{lstlisting}
+
+\subsubsection{\texttt{load\_melspectrogram(path, sr, duration, n\_mels, n\_fft, hop\_length)}}
+
+\begin{lstlisting}[language=Python,caption={Extraction mel-spectrogram partagée}]
+# 1. Chargement
+y, _ = librosa.load(path, sr=sr, duration=duration)
+
+# 2. Validation durée minimale
+if len(y) < sr * 0.5:
+    return None    # Audio trop court
+
+# 3. Padding ou tronquement
+target_len = int(sr * duration)   # = 88200 pour 4s @ 22050 Hz
+if len(y) < target_len:
+    y = np.pad(y, (0, target_len - len(y)), mode='constant')
+else:
+    y = y[:target_len]
+
+# 4. Mel-spectrogram
+mel = librosa.feature.melspectrogram(
+    y=y, sr=sr, n_mels=n_mels, n_fft=n_fft, hop_length=hop_length
+)
+return librosa.power_to_db(mel, ref=np.max)
+# Shape: (n_mels, n_frames) = (128, 173), dtype float32, range [-80, 0] dB
+\end{lstlisting}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Paramètre} & \textbf{Valeur} & \textbf{Calcul} & \textbf{Unité} \\
+\midrule
+\code{sr} & 22050 & — & Hz \\
+\code{duration} & 4.0 & — & s \\
+\code{n\_mels} & 128 & — & bandes \\
+\code{n\_fft} & 2048 & $\approx$ 92.9 ms & samples \\
+\code{hop\_length} & 512 & $\approx$ 23.2 ms & samples \\
+\textbf{n\_frames} & \textbf{173} & $(88200 - 2048) / 512 + 1$ & frames \\
+\textbf{Shape sortie} & \textbf{(128, 173)} & & \\
+\bottomrule
+\end{tabular}
+\caption{Paramètres mel-spectrogram en production}
+\end{table}
+
+\subsection{Extraction de features — 219 features totales}
+
+\subsubsection{Groupe 1 — Base (116 features)}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{@{}lrp{8cm}@{}}
+\toprule
+\textbf{Catégorie} & \textbf{N} & \textbf{Formule / Description} \\
+\midrule
+RMS & 2 & $\sqrt{\sum|s_t|^2 / N}$ — énergie temporelle \\
+ZCR & 2 & $|\{t : y[t] \cdot y[t{+}1] < 0\}| / (n-1)$ — 0=tonal, 1=bruit \\
+Spectral Centroid & 2 & $f_c = \sum(f_k \cdot |X_k|) / \sum|X_k|$ \\
+Spectral Bandwidth & 2 & $\sqrt{\sum((f_k - f_c)^2 \cdot |X_k|) / \sum|X_k|}$ \\
+Spectral Rolloff & 2 & $f_r$ tel que $\sum_{f \leq f_r}|X_f|^2 = 0.85 \sum|X_f|^2$ \\
+Spectral Flatness & 2 & $\exp(\sum\ln|X_k|/N) / (\sum|X_k|/N)$ — entropie Wiener \\
+Spectral Contrast & 2 & $(peak_k - valley_k)/peak_k$ sur 7 bandes \\
+HPSS & 5 & Décomposition harmonique + percussive \\
+MFCC (40 coeff) & 80 & mean + std par coefficient \\
+Chroma (12 notes) & 13 & mean/std global + mean par note \\
+Tempo + Énergie & 3 & BPM, $\sum y^2$, $\max(|y|)$ \\
+\midrule
+\textbf{Total} & \textbf{116} & \\
+\bottomrule
+\end{tabular}
+\caption{Features de base — extract\_base\_features()}
+\end{table}
+
+\subsubsection{Groupe 2 — Véhicule (65 features)}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{@{}lrp{8cm}@{}}
+\toprule
+\textbf{Catégorie} & \textbf{N} & \textbf{Cible acoustique} \\
+\midrule
+Énergie par bande fréq. & 7 & Bandes $<$100, 100-300, 300-2k, $>$2k Hz \\
+Delta MFCC (1\textsuperscript{er} + 2\textsuperscript{e} ordre) & 39 & Changements temporels — $\Delta$ et $\Delta^2$ (13 coeff $\times$ 3) \\
+Mel par bande & 8 & Bandes 0-9, 10-29, 30-59, 60+ \\
+Onset strength & 6 & Pics d'attaque — claquements accélérateur \\
+Spectral flux & 3 & $\sqrt{\sum(|X[k,t]| - |X[k,t{-}1]|)^2}$ \\
+Autocorrelation & 2 & Périodicité moteur \\
+\midrule
+\textbf{Total} & \textbf{65} & \\
+\bottomrule
+\end{tabular}
+\caption{Features véhicule — extract\_vehicle\_features()}
+\end{table}
+
+\subsubsection{Groupe 3 — Bruit (38 features)}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{@{}lrp{8cm}@{}}
+\toprule
+\textbf{Catégorie} & \textbf{N} & \textbf{Cible acoustique} \\
+\midrule
+F0 / RPM & 6 & pYIN [50-500 Hz] $\rightarrow$ RPM $= F_0 \times 60$ \\
+HNR & 3 & Harmonic-to-Noise Ratio en dB \\
+PSD Welch par bande & 7 & Motor 50-150, 150-300, harmonics, exhaust, turbo, aero \\
+Pics spectraux & 3 & \code{find\_peaks()} sur spectre moyen \\
+Analyse dB (RMS) & 7 & mean, max, min, std, range, peaks\_count, peaks\_ratio \\
+Crest factor & 2 & $peak / RMS$ — impulsivité \\
+Énergie haute fréquence & 3 & 2k-8k Hz, $>$8k Hz, ratio \\
+Spectral contrast ext. & 5 & contrast + rolloff 95\% \\
+Variations temporelles & 5 & rms\_diff, zcr par frame \\
+Ratio harm/perc & 2 & percussive\_ratio, perc\_harm\_ratio \\
+\midrule
+\textbf{Total} & \textbf{38} & \\
+\bottomrule
+\end{tabular}
+\caption{Features bruit — extract\_noise\_features()}
+\end{table}
+
+\subsection{Feature importance — Top 12 sélectionnées}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{@{}rlll@{}}
+\toprule
+\textbf{Rang} & \textbf{Feature — CarDetector} & \textbf{Importance} & \textbf{Type} \\
+\midrule
+1 & \code{mfcc\_26\_mean} & 0.0612 & MFCC \\
+2 & \code{mfcc\_25\_mean} & 0.0515 & MFCC \\
+3 & \code{mfcc\_28\_mean} & 0.0479 & MFCC \\
+4 & \code{mfcc\_30\_mean} & 0.0368 & MFCC \\
+5 & \code{mfcc\_31\_mean} & 0.0311 & MFCC \\
+6 & \code{spectral\_contrast\_mean} & 0.0281 & Spectral \\
+7 & \code{mfcc\_21\_mean} & 0.0256 & MFCC \\
+8 & \code{mfcc\_29\_mean} & 0.0220 & MFCC \\
+9 & \code{mfcc\_27\_mean} & 0.0209 & MFCC \\
+10 & \code{dominant\_peak\_freq} & 0.0198 & Spectral \\
+11 & \code{delta\_mfcc\_1\_std} & 0.0154 & $\Delta$MFCC \\
+12 & \code{mfcc\_23\_mean} & 0.0141 & MFCC \\
+\bottomrule
+\end{tabular}
+\caption{Top 12 features — CarDetector (MFCCs hautes dominant : timbre moteur)}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{@{}rlll@{}}
+\toprule
+\textbf{Rang} & \textbf{Feature — NoisyCarDetector} & \textbf{Score} & \textbf{Type} \\
+\midrule
+1 & \code{delta\_mfcc\_1\_std} & 0.0530 & $\Delta$MFCC \\
+2 & \code{mfcc\_25\_mean} & 0.0305 & MFCC \\
+3 & \code{onset\_std} & 0.0254 & Onset \\
+4 & \code{mfcc\_31\_mean} & 0.0239 & MFCC \\
+5 & \code{mfcc\_28\_mean} & 0.0239 & MFCC \\
+6 & \code{mfcc\_34\_mean} & 0.0212 & MFCC \\
+7 & \code{mfcc\_15\_mean} & 0.0210 & MFCC \\
+8 & \code{delta\_mfcc\_3\_std} & 0.0205 & $\Delta$MFCC \\
+9 & \code{mel\_temporal\_var\_mean} & 0.0196 & Mel var \\
+10 & \code{mfcc\_12\_mean} & 0.0175 & MFCC \\
+11 & \code{onset\_mean} & 0.0156 & Onset \\
+12 & \code{mfcc\_26\_mean} & 0.0140 & MFCC \\
+\bottomrule
+\end{tabular}
+\caption{Top 12 features — NoisyCarDetector (variations temporelles dominant : dynamique)}
+\end{table}
+
+\begin{infobox}
+\textbf{Interprétation de la divergence :} Le CarDetector distingue voiture vs bruit ambiant
+via le \textbf{timbre spectral} (MFCCs statiques). Le NoisyCarDetector distingue bruyant vs
+normal via la \textbf{dynamique temporelle} (delta MFCC, onset) — un moteur agressif = variations
+rapides et transitoires marqués.
+\end{infobox}
+
+\subsection{Datasets}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{@{}lrr@{}}
+\toprule
+\textbf{Métrique} & \textbf{CarDetector} & \textbf{NoisyCarDetector} \\
+\midrule
+Total annotations & 28 844 & 49 607 \\
+Label 0 & 14 422 (50\%) & 25 213 (50.8\%) \\
+Label 1 & 14 422 (50\%) & 24 394 (49.2\%) \\
+Reliability 1 (faible) & 45.9\% & 0\% \\
+Reliability 2 (moyen) & 53.4\% & 1.7\% \\
+Reliability 3 (bon) & 0.7\% & 0.1\% \\
+Durée moyenne & 7.54 s & 4.08 s \\
+Médiane durée & 4 s & 4 s \\
+\textbf{Samples features extraites} & \textbf{390 (1.35\%)} & \textbf{526 (1.06\%)} \\
+Features extraites & 182 colonnes & 225 colonnes \\
+\bottomrule
+\end{tabular}
+\caption{Comparaison des deux datasets}
+\end{table}
+
+\begin{warningbox}
+\textbf{Point critique :} Seul \textbf{$\sim$1\%} du dataset est utilisé pour l'extraction de
+features (390/526 samples sur 28k-49k annotations). Le modèle MLP est donc entraîné sur une
+fraction infime des données disponibles.
+\end{warningbox}
+
+% ═══════════════════════════════════════════════════════════════════════════
+\section{Modèles IA}
+
+\subsection{CarDetector — Architecture CRNN (primaire)}
+
+\begin{lstlisting}[style=tree,caption={Architecture CRNN CarDetector}]
+Input: (batch, 128, 173, 1)   <- Mel-spectrogram normalisé en dB
+
+[Conv2D 16 filters (3x3)] + BatchNorm + ReLU + MaxPool(2,2) + Dropout(0.3)
+[Conv2D 32 filters (3x3)] + BatchNorm + ReLU + MaxPool(2,2) + Dropout(0.3)
+[Conv2D 64 filters (3x3)] + BatchNorm + ReLU + MaxPool(2,2) + Dropout(0.3)
+
+Permute: (batch, time', freq', 64) -> (batch, time', freq'*64)
+
+[GRU 32 units] + Dropout(0.4)
+[Dense 32] + ReLU + L2(0.01) + Dropout(0.3)
+[Dense 1]  + Sigmoid  ->  P(voiture) in [0, 1]
+\end{lstlisting}
+
+\textbf{Normalisation du spectrogram :}
+\begin{lstlisting}[language=Python]
+mel_norm = (mel_db - X_mean) / (X_std + 1e-8)
+# X_mean = -31.606   (calculé sur 1000 samples aléatoires)
+# X_std  =  12.724
+# Valeurs sauvegardées dans crnn_config.json pour l'inférence
+\end{lstlisting}
+
+\subsection{NoisyCarDetector — Architecture CNN (primaire)}
+
+\begin{lstlisting}[style=tree,caption={Architecture CNN NoisyCarDetector}]
+Input: (batch, 128, 173, 1)   <- Même format que CRNN
+
+[Conv2D N filters] + MaxPool + Dropout
+[Conv2D N filters] + MaxPool + Dropout
+[Conv2D N filters] + MaxPool + Dropout
+[Flatten]
+[Dense 32/64] + Dropout
+[Dense 1] + Sigmoid  ->  P(bruyant) in [0, 1]
+\end{lstlisting}
+
+Configuration mel (\code{cnn\_config.json}) :
+\begin{lstlisting}[language=Python]
+{
+  "sr": 22050, "duration": 4.0, "n_mels": 128,
+  "n_fft": 2048, "hop_length": 512,
+  "X_mean": -30.8229, "X_std": 12.1508,
+  "input_shape": [128, 173, 1]
+}
+\end{lstlisting}
+
+\subsection{Fallback MLP (les deux modèles)}
+
+\begin{lstlisting}[style=tree,caption={Architecture MLP fallback}]
+Input: (batch, 12)   <- 12 top features tabulaires (StandardScaler)
+
+[Dense 64] + ReLU + L2(0.001) + Dropout(0.3)
+[Dense 32] + ReLU + L2(0.001) + Dropout(0.2)
+[Dense 1]  + Sigmoid  ->  probabilité
+\end{lstlisting}
+
+\subsection{Logique de chargement (priorité)}
+
+\begin{lstlisting}[language=Python,caption={Logique de chargement dual}]
+def load(self):
+    # 1. Priorité : CRNN (ou CNN pour NoisyCarDetector)
+    if Path(CRNN_MODEL_PATH).exists():
+        self._use_crnn = True
+        self.model = tf.keras.models.load_model(CRNN_MODEL_PATH)
+        with open(CRNN_CONFIG_PATH) as f:
+            cfg = json.load(f)
+            self.X_mean, self.X_std = cfg['X_mean'], cfg['X_std']
+        return True
+
+    # 2. Fallback : MLP
+    if Path(MODEL_PATH).exists():
+        self._use_crnn = False
+        self.model = tf.keras.models.load_model(MODEL_PATH)
+        self.scaler = joblib.load(SCALER_PATH)
+        self.feature_names = open(FEATURES_PATH).read().splitlines()
+        return True
+
+    return False
+\end{lstlisting}
+
+\subsection{Performance comparée}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{@{}llrrr@{}}
+\toprule
+\textbf{Modèle} & \textbf{Architecture} & \textbf{Dataset} & \textbf{F1} & \textbf{Accuracy} \\
+\midrule
+CarDetector CRNN & Conv$\times$3 + GRU & 2 360 (équil.) & 0.668 & — \\
+CarDetector MLP & Dense$\times$2 & $\sim$390 & $\sim$0.87 & $\sim$0.87 \\
+NoisyCarDetector CNN & Conv$\times$3 + Dense & 47 336 (équil.) & \ok{0.9938} & \ok{0.9938} \\
+NoisyCarDetector MLP & Dense$\times$2 & $\sim$526 & $\sim$0.87 & $\sim$0.87 \\
+\bottomrule
+\end{tabular}
+\caption{Performances comparées (CV 5-fold StratifiedKFold)}
+\end{table}
+
+\begin{warningbox}
+\textbf{Divergence notable :} Le CarDetector (CRNN, F1=0.668) performe bien en-dessous du
+NoisyCarDetector (CNN, F1=0.994). Cause principale : dataset 20$\times$ plus petit (2 360 vs
+47 336 samples d'entraînement).
+\end{warningbox}
+
+\subsection{Artefacts et tailles}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Fichier} & \textbf{Taille} & \textbf{Type} & \textbf{Rôle} \\
+\midrule
+\code{crnn\_car\_detector.h5} & $\sim$1.6 MB & Keras H5 & CRNN primaire \\
+\code{crnn\_config.json} & 369 bytes & JSON & Params mel + stats norm \\
+\code{model.h5} (car) & $\sim$200 KB & Keras H5 & MLP fallback \\
+\code{scaler.pkl} (car) & $\sim$2 KB & Joblib & StandardScaler \\
+\code{features.txt} (car) & $<$1 KB & Texte & 12 noms de features \\
+\code{cnn\_noisy\_car.h5} & $\sim$5 MB & Keras H5 & CNN primaire \\
+\code{cnn\_config.json} & $\sim$1 KB & JSON & Params mel + stats norm \\
+\code{model.h5} (noisy) & 67 KB & Keras H5 & MLP fallback \\
+\code{scaler.pkl} (noisy) & 903 bytes & Joblib & StandardScaler \\
+\bottomrule
+\end{tabular}
+\caption{Artefacts modèles}
+\end{table}
+
+% ═══════════════════════════════════════════════════════════════════════════
+\section{Entraînement}
+
+\subsection{CRNN CarDetector (\texttt{train\_crnn.py}, 355 lignes)}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Hyperparamètre} & \textbf{Valeur} & \textbf{Hyperparamètre} & \textbf{Valeur} \\
+\midrule
+Optimizer & Adam lr=5e-4 & Loss & binary\_crossentropy \\
+Epochs max & 50 & Batch size & 16 \\
+CV folds & 5 (stratifié) & Random state & 42 \\
+min\_reliability & 2 & Balance & sous-échantillonnage \\
+\bottomrule
+\end{tabular}
+\caption{Hyperparamètres CRNN}
+\end{table}
+
+\textbf{Callbacks :}
+\begin{lstlisting}[language=Python]
+EarlyStopping(patience=8, monitor='val_loss', restore_best_weights=True)
+ReduceLROnPlateau(patience=4, factor=0.5, min_lr=1e-5)
+\end{lstlisting}
+
+\textbf{Augmentation de données (SpecAugment) — facteur $\times 2$ :}
+\begin{lstlisting}[language=Python]
+# Sélection selon i % 3 :
+# 0 -> Shift temporel
+X_aug = np.roll(X, shift=randint(1, n_frames//4), axis=1)
+
+# 1 -> Gaussian noise (SNR ~20dB)
+X_aug = X + np.random.normal(0, 0.05, X.shape)
+
+# 2 -> SpecAugment : frequency masking + time masking
+f0 = randint(0, n_mels - f); X_aug[f0:f0+f, :] = X.min()
+t0 = randint(0, n_frames - t); X_aug[:, t0:t0+t] = X.min()
+\end{lstlisting}
+
+\textbf{Gestion mémoire (memmap) :}
+\begin{lstlisting}[language=Python]
+if n_samples > 10000:
+    # Évite OutOfMemory pour gros datasets
+    X = np.memmap('/tmp/car_spectros.dat', dtype='float32',
+                  mode='w+', shape=(n_samples, 128, n_frames))
+else:
+    X = np.zeros((n_samples, 128, n_frames), dtype='float32')
+\end{lstlisting}
+
+\subsection{Reproductibilité}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Élément} & \textbf{Valeur fixe} & \textbf{Localisation} \\
+\midrule
+StratifiedKFold random\_state & 42 & train\_crnn.py:278 \\
+train\_test\_split random\_state & 42 & train.py \\
+RandomForest random\_state & 42 & benchmark.py \\
+sample\_files seed & 42 & test\_pipeline.py:32 \\
+np.random.seed & 42 & scripts d'analyse \\
+\bottomrule
+\end{tabular}
+\caption{Reproductibilité — seeds fixes}
+\end{table}
+
+% ═══════════════════════════════════════════════════════════════════════════
+\section{Évaluation et métriques}
+
+\subsection{Protocole test\_pipeline.py — 4 cas}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Cas} & \textbf{Source CSV} & \textbf{label} & \textbf{Attendu} \\
+\midrule
+Voitures bruyantes & \code{noisy\_car\_detector/annotation.csv} & 1 & car=True, noisy=True \\
+Voitures normales & \code{noisy\_car\_detector/annotation.csv} & 0 & car=True, noisy=False \\
+Bruit pur & \code{car\_detector/annotation.csv} & 0 & car=False (cascade stop) \\
+Voitures (car\_det) & \code{car\_detector/annotation.csv} & 1 & car=True \\
+\bottomrule
+\end{tabular}
+\caption{4 cas de test — 10 fichiers/cas, min\_reliability=2, seed=42}
+\end{table}
+
+\textbf{Seuils de verdict :}
+\begin{itemize}
+  \item \ok{Vert (Prête prod)} : car\_acc $\geq$ 80\% ET noisy\_acc $\geq$ 75\%
+  \item \warn{Jaune (Amélioration)} : car\_acc $\geq$ 65\%
+  \item \critical{Rouge (Retraining)} : car\_acc $<$ 65\%
+\end{itemize}
+
+\subsection{Les 8 graphiques de report\_pipeline.py}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{@{}clp{9cm}@{}}
+\toprule
+\textbf{\#} & \textbf{Type} & \textbf{Données visualisées} \\
+\midrule
+1 & Heatmap 2$\times$2 & Matrice confusion CarDetector (TP, TN, FP, FN + \%) \\
+2 & Heatmap 2$\times$2 & Matrice confusion NoisyCarDetector (filtré sur car=True) \\
+3 & Histogrammes stacked & Distribution P(voiture) et P(bruyant) par cas \\
+4 & Courbes ROC & FPR/TPR + AUC pour les deux modèles \\
+5 & Boxplot + histogramme & Latences (médiane, P95) par cas \\
+6 & Barres horizontales & Précision \% par cas (seuil 80\%) \\
+7 & Barres verticales & 8 outcomes cascade (TN/TP/FP/FN car + noisy) \\
+8 & Histogrammes superposés & Calibration : P(correct) vs P(incorrect) \\
+\bottomrule
+\end{tabular}
+\caption{8 graphiques générés par report\_pipeline.py}
+\end{table}
+
+\subsection{Benchmark sklearn — 10 modèles}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{\#} & \textbf{Modèle} & \textbf{Config} & \textbf{F1 typique} \\
+\midrule
+1 & Logistic Regression & max\_iter=1000 & 0.85-0.90 \\
+2 & Random Forest & n\_estimators=100 & 0.92-0.95 \\
+3 & Gradient Boosting & n\_estimators=100 & 0.90-0.94 \\
+4 & SVM RBF & probability=True & 0.88-0.92 \\
+5 & SVM Linear & probability=True & 0.85-0.90 \\
+6 & KNN k=5 & — & 0.82-0.88 \\
+7 & KNN k=3 & — & 0.80-0.87 \\
+8 & Naive Bayes & GaussianNB & 0.75-0.82 \\
+9 & MLP (32) & hidden=(32,) & 0.84-0.89 \\
+10 & MLP (64,32) & hidden=(64,32) & 0.87-0.91 \\
+\bottomrule
+\end{tabular}
+\caption{10 modèles benchmark — CV 5-fold StratifiedKFold}
+\end{table}
+
+% ═══════════════════════════════════════════════════════════════════════════
+\section{API et infrastructure}
+
+\subsection{Endpoints Lambda API}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{@{}lllll@{}}
+\toprule
+\textbf{Endpoint} & \textbf{Méthode} & \textbf{Auth} & \textbf{Retour} \\
+\midrule
+\code{/predict} & POST & Optionnel & Format simplifié frontend \\
+\code{/predict/detailed} & POST & Optionnel & Format complet (to\_dict) \\
+\code{/health} & GET & Non & Statut + modèles chargés \\
+\bottomrule
+\end{tabular}
+\caption{Endpoints Lambda API}
+\end{table}
+
+\textbf{Réponse \code{POST /predict} :}
+\begin{lstlisting}[language=Python,caption={Format de réponse simplifié}]
+{
+  "hasNoisyVehicle": true,
+  "confidence": 0.95,
+  "maxDecibels": 95,
+  "message": "VOITURE BRUYANTE detectee !",
+  "filename": "audio.wav",
+  "_full_result": {
+    "car_detected": true, "car_confidence": 92.5,
+    "car_probability": 0.925,
+    "is_noisy": true, "noisy_confidence": 99.4,
+    "noisy_probability": 0.994, "estimated_db": 95
+  }
+}
+\end{lstlisting}
+
+\textbf{Codes d'erreur HTTP :}
+\begin{table}[htbp]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Code} & \textbf{Cas} & \textbf{Message} \\
+\midrule
+400 & Extension non supportée & \code{"Format non supporte. Extensions: .wav..."} \\
+400 & Content-Type invalide & \code{"Le fichier doit etre un fichier audio"} \\
+400 & Email déjà existant (register) & \code{"Email deja enregistre"} \\
+401 & Credentials invalides & \code{"Email ou mot de passe incorrect"} \\
+403 & Non-admin sur /admin/* & \code{"Acces reserve aux administrateurs"} \\
+500 & Erreur pipeline & \code{"<exception string>"} \\
+\bottomrule
+\end{tabular}
+\caption{Codes d'erreur HTTP}
+\end{table}
+
+\textbf{Validation et gestion fichier temporaire :}
+\begin{lstlisting}[language=Python,caption={Gestion fichier temporaire Lambda}]
+# /tmp/ = seul répertoire writable sur Lambda (max 512 MB)
+with tempfile.NamedTemporaryFile(delete=False, suffix=suffix, dir='/tmp') as f:
+    try:
+        shutil.copyfileobj(file.file, f)
+        temp_path = f.name
+    finally:
+        file.file.close()    # Évite file descriptor leak
+
+try:
+    result = pipeline.analyze(temp_path)
+    return result.to_simplified()
+except Exception as e:
+    raise HTTPException(status_code=500, detail=str(e))
+finally:
+    if os.path.exists(temp_path):
+        os.unlink(temp_path)  # Nettoyage garanti
+\end{lstlisting}
+
+\subsection{Endpoints EC2 API}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{@{}lllp{4cm}@{}}
+\toprule
+\textbf{Catégorie} & \textbf{Endpoint} & \textbf{Méthode} & \textbf{Auth} \\
+\midrule
+Auth & \code{/register} & POST & Non \\
+Auth & \code{/token} & POST & Non (form) \\
+Auth & \code{/users/me} & GET & JWT requis \\
+User & \code{/stats} & GET & JWT requis \\
+User & \code{/history} & GET & JWT requis \\
+User & \code{/analysis-results} & POST & JWT requis \\
+Admin & \code{/admin/annotation-requests} & GET & Admin JWT \\
+Admin & \code{/admin/annotation-requests/\{id\}/review} & POST & Admin JWT \\
+Annotations & \code{/annotation-requests} & POST & JWT requis \\
+S3 Audio & \code{/s3-audio/*} & GET/POST & JWT requis \\
+\bottomrule
+\end{tabular}
+\caption{Endpoints EC2 API}
+\end{table}
+
+% ═══════════════════════════════════════════════════════════════════════════
+\section{Cold start Lambda}
+
+\subsection{Chronologie et optimisations}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Phase} & \textbf{Durée} & \textbf{Notes} \\
+\midrule
+S3 Download (10 fichiers, 4 workers) & 2-3 s & Parallèle \\
+Import TensorFlow & 3-5 s & Module init + JIT \\
+Pipeline init (2 modèles) & 2-3 s & Chargement .h5 \\
+Première inférence & 2-3 s & Audio + features + predict \\
+\textbf{Total cold start} & \textbf{$\sim$15-20 s} & Lambda 512 MB \\
+\textbf{Warm start} & \textbf{$<$50 ms} & Modèles en mémoire \\
+\bottomrule
+\end{tabular}
+\caption{Benchmark cold start Lambda}
+\end{table}
+
+\begin{lstlisting}[language=Python,caption={Optimisation 1 — Caches avant imports}]
+# TOP de main.py -- AVANT tout import TF/librosa
+os.environ['NUMBA_CACHE_DIR'] = '/tmp'
+os.environ['MPLCONFIGDIR'] = '/tmp'
+os.environ['TRANSFORMERS_CACHE'] = '/tmp'
+os.environ['XDG_CACHE_HOME'] = '/tmp'
+\end{lstlisting}
+
+\begin{lstlisting}[language=Python,caption={Optimisation 2 — Download S3 parallèle}]
+to_download = [a for a in artifacts if not os.path.exists(f"/tmp/models/{a}")]
+
+def _fetch(artifact):
+    local_path = f"/tmp/models/{artifact}"
+    try:
+        s3.download_file(bucket, f"models/{artifact}", local_path)
+        return artifact, None
+    except ClientError as e:
+        return artifact, str(e)
+
+with ThreadPoolExecutor(max_workers=4) as pool:
+    futures = {pool.submit(_fetch, a): a for a in to_download}
+    for future in as_completed(futures):
+        artifact, err = future.result()
+
+# Circuit breaker
+critical = {"car_detector/artifacts/crnn_car_detector.h5",
+            "noisy_car_detector/artifacts/cnn_noisy_car.h5"}
+if critical & set(errors):
+    print_error("Critical model artifacts missing")
+\end{lstlisting}
+
+\begin{lstlisting}[language=Python,caption={Optimisation 3 — Pipeline singleton module-level}]
+# predict.py — chargé une fois au cold start, réutilisé sur tous les warm starts
+pipeline = Pipeline()
+pipeline.load_models()
+
+@router.post("/predict")
+async def predict_audio(request: Request, file: UploadFile = File(...)):
+    # pipeline déjà chargé, pas de réinitialisation
+    result = pipeline.analyze(temp_path)
+\end{lstlisting}
+
+% ═══════════════════════════════════════════════════════════════════════════
+\section{Base de données}
+
+\subsection{Schéma complet}
+
+\subsubsection{Table \texttt{users}}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Colonne} & \textbf{Type} & \textbf{Contrainte} & \textbf{Notes} \\
+\midrule
+id & INTEGER & PRIMARY KEY & Auto-increment \\
+email & STRING(255) & UNIQUE, INDEX & — \\
+hashed\_password & STRING(255) & NOT NULL & bcrypt \\
+is\_active & BOOLEAN & DEFAULT TRUE & — \\
+is\_admin & BOOLEAN & DEFAULT FALSE & — \\
+created\_at & DATETIME & DEFAULT now() & — \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Table \texttt{car\_detections}}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Colonne} & \textbf{Type} & \textbf{Notes} \\
+\midrule
+id & INTEGER & PRIMARY KEY \\
+filename & STRING(255) & — \\
+car\_detected & BOOLEAN & — \\
+confidence & FLOAT & 0-100 \\
+probability & FLOAT & 0-1 \\
+timestamp & DATETIME & INDEX \\
+user\_id & INTEGER & FK $\rightarrow$ users \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Table \texttt{noisy\_car\_analyses}}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Colonne} & \textbf{Type} & \textbf{Notes} \\
+\midrule
+id & INTEGER & PRIMARY KEY \\
+is\_noisy & BOOLEAN & — \\
+confidence & FLOAT & 0-100 \\
+probability & FLOAT & 0-1 \\
+estimated\_db & INTEGER & $\sim$85-100 \\
+car\_detection\_id & INTEGER & FK $\rightarrow$ car\_detections (UNIQUE, 1-to-1) \\
+user\_id & INTEGER & FK $\rightarrow$ users \\
+timestamp & DATETIME & — \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Table \texttt{annotation\_requests}}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Colonne} & \textbf{Type} & \textbf{Notes} \\
+\midrule
+id & INTEGER & PRIMARY KEY \\
+filename & STRING(255) & — \\
+audio\_path & STRING(500) & — \\
+annotations\_data & JSON & CSV parsé \\
+model\_type & STRING(50) & car\_detector $|$ noisy\_car\_detector \\
+status & STRING(20) & pending / approved / rejected \\
+annotation\_count & INTEGER & — \\
+total\_duration & FLOAT & secondes \\
+user\_id & INTEGER & FK $\rightarrow$ users (submitter) \\
+reviewed\_by\_id & INTEGER & FK $\rightarrow$ users (admin, nullable) \\
+reviewed\_at & DATETIME & nullable \\
+admin\_note & STRING(500) & nullable \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Relations}
+
+\begin{lstlisting}[style=tree]
+User (1) ─→ (many) CarDetection
+User (1) ─→ (many) NoisyCarAnalysis
+User (1) ─→ (many) AnnotationRequest  (submitted_by)
+User (1) ─→ (many) AudioReview        (reviewer)
+CarDetection (1) ─→ (1) NoisyCarAnalysis
+\end{lstlisting}
+
+% ═══════════════════════════════════════════════════════════════════════════
+\section{Sécurité}
+
+\subsection{JWT Bearer Token}
+
+\begin{lstlisting}[language=Python,caption={Payload JWT}]
+{
+  "sub": "user@example.com",   # email = identifiant unique
+  "exp": 1708123456            # timestamp d'expiration
+}
+# Algorithm : HS256
+# Durée     : 1440 min = 24h  (configurable ACCESS_TOKEN_EXPIRE_MINUTES)
+\end{lstlisting}
+
+\subsection{Hachage de mot de passe}
+
+\begin{lstlisting}[language=Python,caption={Configuration passlib}]
+pwd_context = CryptContext(
+    schemes=["bcrypt", "pbkdf2_sha256"],
+    deprecated="auto"
+)
+# Primary  : bcrypt (salt auto, cost factor adaptatif)
+# Fallback : pbkdf2_sha256  (legacy passwords)
+# Double fallback : bcrypt.checkpw() direct si passlib échoue
+\end{lstlisting}
+
+\subsection{Secret Key}
+
+\begin{lstlisting}[language=Python,caption={Gestion de la Secret Key}]
+@property
+def SECRET_KEY(self) -> str:
+    key = os.environ.get("SECRET_KEY")
+    if not key:
+        # Génère une clé temporaire + WARNING
+        # -> Sessions invalidées au redémarrage !
+        if not hasattr(self, "_generated_key"):
+            self._generated_key = secrets.token_urlsafe(32)
+            warnings.warn("SECURITE: Aucune SECRET_KEY définie.", RuntimeWarning)
+        return self._generated_key
+    return key
+\end{lstlisting}
+
+\begin{warningbox}
+\textbf{Risque sécurité :} Si \code{SECRET\_KEY} n'est pas définie dans les variables
+d'environnement, une clé temporaire est générée à chaque redémarrage. Toutes les sessions
+actives sont alors invalidées.\\[4pt]
+\textbf{Action :} \code{export SECRET\_KEY=\$(openssl rand -hex 32)}
+\end{warningbox}
+
+\subsection{Dépendances d'authentification FastAPI}
+
+\begin{lstlisting}[language=Python,caption={3 niveaux d'auth}]
+# 1. Obligatoire  -> 401 si absent ou invalide
+async def get_current_user(token = Depends(oauth2_scheme), db = Depends(get_db))
+
+# 2. Admin uniquement -> 403 si non-admin
+async def get_admin_user(current_user = Depends(get_current_user))
+
+# 3. Optionnel -> None si absent  (pour /predict)
+def get_optional_user(request, db) -> User | None
+\end{lstlisting}
+
+% ═══════════════════════════════════════════════════════════════════════════
+\section{Déploiement Docker et CodeBuild}
+
+\subsection{Dockerfile.lambda (production)}
+
+\begin{lstlisting}[language=bash,caption={Dockerfile Lambda (simplifié)}]
+FROM public.ecr.aws/lambda/python:3.11
+
+# Caches /tmp (seul writable sur Lambda)
+ENV NUMBA_CACHE_DIR=/tmp MPLCONFIGDIR=/tmp XDG_CACHE_HOME=/tmp
+
+RUN yum install -y gcc gcc-c++ libsndfile && yum clean all
+
+COPY requirements.txt ${LAMBDA_TASK_ROOT}/
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Copie minimal (pas data, pas tests, pas notebooks)
+COPY config/ shared/ models/ pipeline/ database/ api/lambda_api/ \
+     ${LAMBDA_TASK_ROOT}/...
+
+CMD ["api.lambda_api.main.handler"]
+\end{lstlisting}
+
+\subsection{CodeBuild (buildspec.yml)}
+
+\begin{lstlisting}[language=bash,caption={Pipeline CI/CD CodeBuild}]
+pre_build:
+  - aws ecr get-login-password | docker login --username AWS --password-stdin $ECR
+  - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c1-7)
+
+build:
+  - cd Quantnuis-Backend
+  - docker build -f Dockerfile.lambda -t $ECR_REPO_URI:$IMAGE_TAG .
+  - docker tag $ECR_REPO_URI:$IMAGE_TAG $ECR_REPO_URI:latest
+
+post_build:
+  - docker push $ECR_REPO_URI:$IMAGE_TAG
+  - docker push $ECR_REPO_URI:latest
+  - aws lambda update-function-code \
+      --function-name quantnuis-api \
+      --image-uri $ECR_REPO_URI:$IMAGE_TAG
+  - aws lambda wait function-updated --function-name quantnuis-api
+\end{lstlisting}
+
+\subsection{Script deploy\_lambda.sh}
+
+\begin{lstlisting}[language=bash,caption={Deploy one-command}]
+# [1/3] ZIP source (exclut venv/, data/, __pycache__, .env)
+python3 -c "import zipfile; ..."  # -> /tmp/quantnuis-lambda-src.zip
+
+# [2/3] Upload S3
+aws s3 cp /tmp/quantnuis-lambda-src.zip \
+    s3://quantnuis-db-bucket/codebuild/source.zip
+
+# [3/3] Start CodeBuild + polling toutes les 10s
+BUILD_ID=$(aws codebuild start-build --project-name quantnuis-lambda-deploy)
+while [ "$STATUS" != "SUCCEEDED" ]; do
+    sleep 10
+    STATUS=$(aws codebuild batch-get-builds --ids "$BUILD_ID" ...)
+done
+\end{lstlisting}
+
+% ═══════════════════════════════════════════════════════════════════════════
+\section{Scripts et outils}
+
+\subsection{CLI (\texttt{quantnuis\_cli.py})}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{@{}lp{10cm}@{}}
+\toprule
+\textbf{Menu} & \textbf{Sous-options} \\
+\midrule
+1. Dataset & Status, ajout slices, nettoyage orphelins, découpage audio \\
+2. Pipeline ML & Extraire features, sélection features (top 40), benchmark, entraîner \\
+3. Scraping & Freesound preview/download, YouTube preview/download \\
+4. Google Drive & Status diff, upload, download, bisync (rclone) \\
+5. Inférence & Analyser un fichier audio \\
+6. Serveur API & Dev (--reload) ou prod (--workers 4) \\
+7. Administration & Créer admin, migration SQLite→PostgreSQL \\
+\bottomrule
+\end{tabular}
+\caption{Menu CLI hiérarchique}
+\end{table}
+
+\subsection{Scraping}
+
+\textbf{Freesound (\code{scrape\_freesound.py}) :}
+\begin{itemize}
+  \item API Freesound v2 (clé \code{FREESOUND\_API\_KEY})
+  \item Filtre durée : MIN\_DURATION = 3.0 s
+  \item Découpe segments 4 s (sans overlap)
+  \item Auto-label via tags : \code{NOISY\_TAGS} = \{loud, revving, acceleration, sport, exhaust, turbo, race...\}
+  \item Historique JSON (déduplication inter-sources)
+\end{itemize}
+
+\textbf{YouTube (\code{scrape\_youtube.py}) :}
+\begin{itemize}
+  \item yt-dlp (fallback youtube-dl)
+  \item Max 120 s par vidéo
+  \item Découpe 4 s, overlap 50\%
+  \item Même historique JSON que Freesound
+\end{itemize}
+
+\subsection{Extraction features parallèle}
+
+\begin{lstlisting}[language=Python,caption={Architecture workers}]
+# extract_features_parallel.py
+os.environ['NUMBA_DISABLE_JIT'] = '1'   # Évite lenteurs numba
+os.environ['OMP_NUM_THREADS'] = '1'     # Un thread par worker
+
+with ProcessPoolExecutor(max_workers=16) as executor:
+    futures = {executor.submit(extract_worker, path, label): path
+               for path, label in samples}
+    for future in as_completed(futures):
+        result = future.result()   # ~219 features ou None si erreur
+# Output: features_all.csv
+\end{lstlisting}
+
+\subsection{Active learning (\texttt{scripts/active\_learning.py})}
+
+\begin{lstlisting}[style=tree,caption={Uncertainty Sampling — algorithme}]
+Seed 50/50 -> Train LR + MLP(64->32) sur features
+    |
+    v
+Loop:
+  1. Prédire proba sur pool (non sélectionnés)
+  2. Incertitude = |proba - 0.5|   (minimiser = plus incertain)
+  3. Ajouter batch des N plus incertains
+  4. Réentraîner + évaluer F1 (CV 5-fold)
+  5. Stop si pas d'amélioration pendant 15 itérations
+\end{lstlisting}
+
+% ═══════════════════════════════════════════════════════════════════════════
+\section{Configuration système}
+
+\subsection{Settings singleton (\texttt{config/settings.py})}
+
+\begin{lstlisting}[language=Python,caption={Pattern singleton}]
+@lru_cache()
+def get_settings() -> Settings:
+    settings = Settings()
+    settings.setup_lambda_caches()
+    return settings
+\end{lstlisting}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Paramètre} & \textbf{Valeur / Source} & \textbf{Usage} \\
+\midrule
+\code{IS\_LAMBDA} & \code{bool(AWS\_LAMBDA\_FUNCTION\_NAME)} & Chemins, caches \\
+\code{SAMPLE\_RATE} & 22050 Hz & Constant \\
+\code{N\_MFCC} & 40 & Constant \\
+\code{CAR\_DETECTION\_THRESHOLD} & 0.5 & Seuil décision \\
+\code{NOISY\_THRESHOLD} & 0.5 & Seuil décision \\
+\code{TRAINING\_EPOCHS} & 60 & MLP \\
+\code{TRAINING\_BATCH\_SIZE} & 16 & MLP \\
+\code{SMOTE\_K\_NEIGHBORS} & 3 & Oversampling \\
+\code{TEST\_SIZE} & 0.2 & Split \\
+\code{TOP\_FEATURES\_COUNT} & 12 & Feature selection \\
+\code{ACCESS\_TOKEN\_EXPIRE\_MINUTES} & 1440 & JWT \\
+\code{S3\_BUCKET\_NAME} & \code{quantnuis-db-bucket} & Modèles + BDD \\
+\code{S3\_AUDIO\_BUCKET\_NAME} & \code{quantnuis-audio-bucket} & Audio users \\
+\bottomrule
+\end{tabular}
+\caption{Paramètres de configuration}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Chemin} & \textbf{Lambda} & \textbf{Local} \\
+\midrule
+\code{TMP\_DIR} & \code{/tmp} & \code{\{BASE\_DIR\}/tmp} \\
+\code{CAR\_DETECTOR\_DIR} & \code{/tmp/models/car\_detector/artifacts} & \code{\{BASE\_DIR\}/models/...} \\
+\code{NOISY\_CAR\_DETECTOR\_DIR} & \code{/tmp/models/noisy.../artifacts} & \code{\{BASE\_DIR\}/models/...} \\
+\code{DB\_PATH} & \code{/tmp/quantnuis.db} & \code{\{DATA\_DIR\}/quantnuis.db} \\
+\bottomrule
+\end{tabular}
+\caption{Chemins adaptatifs Lambda vs local}
+\end{table}
+
+% ═══════════════════════════════════════════════════════════════════════════
+\section{Limites et dette technique}
+
+\begin{warningbox}
+\textbf{Point critique \#1 — Sous-utilisation du dataset :}
+Seul $\sim$1\% du dataset est utilisé pour l'extraction de features (390/526 samples
+sur 28k-49k annotations). Le modèle MLP est entraîné sur une fraction infime.\\[4pt]
+\textbf{Action :} Relancer \code{extract\_features\_parallel.py} sur 100\% du dataset.
+\end{warningbox}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{@{}clp{8cm}l@{}}
+\toprule
+\textbf{\#} & \textbf{Problème} & \textbf{Description} & \textbf{Priorité} \\
+\midrule
+1 & Sous-utilisation dataset & 1\% features extraites sur 28k-49k annotations & \critical{Critique} \\
+2 & Pas de holdout test set & CV sur le même dataset = métriques optimistes & \critical{Critique} \\
+3 & Seuils fixes (0.5) & Non-optimisés via ROC / PR curves & \warn{Haute} \\
+4 & CRNN F1=0.668 & Dataset trop petit, pas d'ablation hyperparamètres & \warn{Haute} \\
+5 & Propagation erreurs cascade & FP CarDetector = double erreur non détectée & \warn{Haute} \\
+6 & Augmentation synthétique & SpecAugment $\neq$ bruits réels (vent, pluie, trafic) & Moyenne \\
+7 & Comparaison CNN vs MLP & Inputs radicalement différents (22k vs 12 valeurs) & Moyenne \\
+8 & Pas de tests statistiques & Pas de t-test, McNemar, ECE, Brier score & Moyenne \\
+9 & Secret Key optionnelle & Sessions invalidées si env var manquante & \warn{Haute} \\
+10 & EC2 sans Elastic IP & IP dynamique = frontend cassé après redémarrage & Moyenne \\
+\bottomrule
+\end{tabular}
+\caption{Inventaire de la dette technique}
+\end{table}
+
+\textbf{Actions recommandées par priorité :}
+\begin{enumerate}
+  \item \critical{Extraire features sur 100\% du dataset} (pas seulement 1\%)
+  \item \critical{Créer un holdout test set final} (20\%, jamais touché pendant CV)
+  \item \warn{Optimiser les seuils} via \code{precision\_recall\_curve}
+  \item \warn{Grid-search CRNN} (GRU units, dropout, learning rate)
+  \item \warn{Définir \code{SECRET\_KEY}} dans tous les environnements
+  \item Assigner une \textbf{Elastic IP} à l'EC2
+  \item Ajouter tests statistiques (\code{scipy.stats.wilcoxon})
+  \item Intégrer données de bruit réel dans l'augmentation
+\end{enumerate}
+
+% ═══════════════════════════════════════════════════════════════════════════
+\section*{Résumé exécutif}
+\addcontentsline{toc}{section}{Résumé exécutif}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Aspect} & \textbf{État} & \textbf{Détail} \\
+\midrule
+Architecture & \ok{✓ Solide} & Pipeline cascade propre, API bifurquée Lambda/EC2 \\
+CarDetector CRNN & \warn{⚠ Moyen} & F1=0.668 (dataset trop petit : 2 360 samples) \\
+NoisyCarDetector CNN & \ok{✓ Excellent} & F1=0.9938 (47 336 samples, très stable) \\
+Extraction features & \critical{✗ Critique} & 1\% du dataset utilisé (390/526 sur 28k-49k) \\
+Cold start Lambda & \ok{✓ Optimisé} & $\sim$15-20 s (parallélisme S3, singleton pipeline) \\
+Sécurité & \warn{⚠ À sécuriser} & bcrypt + JWT HS256, mais Secret Key optionnelle \\
+Reproductibilité & \ok{✓ Bonne} & Seeds fixes (42), versions lockées, JSON config \\
+Déploiement CI/CD & \ok{✓ Complet} & One-command deploy + CodeBuild automatisé \\
+Tests & \warn{⚠ Incomplet} & Pas de holdout final, pas de tests statistiques \\
+BDD & \ok{✓ Propre} & SQLite local/Lambda + PostgreSQL prod, migration script \\
+\bottomrule
+\end{tabular}
+\caption{Résumé exécutif du projet}
+\end{table}
+
+\vfill
+\begin{center}
+  \small\textcolor{gray}{
+    Rapport généré automatiquement par une équipe de 5 agents d'analyse parallèles\\
+    Quantnuis-Backend — 2026-03-10
+  }
+\end{center}
+
+\end{document}

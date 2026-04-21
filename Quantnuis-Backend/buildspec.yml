@@ -1,0 +1,39 @@
+version: 0.2
+
+env:
+  variables:
+    AWS_DEFAULT_REGION: eu-west-3
+    ECR_REPO_URI: 468087121592.dkr.ecr.eu-west-3.amazonaws.com/quantnuis-api
+    LAMBDA_FUNCTION_NAME: quantnuis-api
+
+phases:
+  pre_build:
+    commands:
+      - echo "Logging in to ECR..."
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ECR_REPO_URI
+      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c1-7)
+      - IMAGE_TAG=${COMMIT_HASH:-latest}
+      - echo "Image tag = $IMAGE_TAG"
+
+  build:
+    commands:
+      - echo "Building Docker image..."
+      - cd Quantnuis-Backend
+      - docker build -f Dockerfile.lambda -t $ECR_REPO_URI:$IMAGE_TAG .
+      - docker tag $ECR_REPO_URI:$IMAGE_TAG $ECR_REPO_URI:latest
+
+  post_build:
+    commands:
+      - echo "Pushing image to ECR..."
+      - docker push $ECR_REPO_URI:$IMAGE_TAG
+      - docker push $ECR_REPO_URI:latest
+      - echo "Updating Lambda function..."
+      - |
+        aws lambda update-function-code \
+          --function-name $LAMBDA_FUNCTION_NAME \
+          --image-uri $ECR_REPO_URI:$IMAGE_TAG \
+          --region $AWS_DEFAULT_REGION
+      - echo "Waiting for Lambda update..."
+      - aws lambda wait function-updated --function-name $LAMBDA_FUNCTION_NAME --region $AWS_DEFAULT_REGION
+      - echo "Deploy complete! Image = $ECR_REPO_URI:$IMAGE_TAG"
+      - aws lambda get-function --function-name $LAMBDA_FUNCTION_NAME --region $AWS_DEFAULT_REGION --query 'Configuration.[FunctionName,LastModified,State]' --output text

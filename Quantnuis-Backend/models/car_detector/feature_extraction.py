@@ -20,9 +20,9 @@ import pandas as pd
 from pathlib import Path
 
 from shared import (
-    print_header, print_success, print_info, 
-    print_warning, print_error, load_audio, 
-    normalize_audio, extract_base_features
+    print_header, print_success, print_info,
+    print_warning, print_error, load_audio,
+    normalize_audio, extract_all_features
 )
 from . import config
 
@@ -30,33 +30,35 @@ from . import config
 def extract_car_features(file_path: str) -> dict | None:
     """
     Extrait les caractéristiques audio pour la détection de voiture.
-    
-    Utilise la fonction partagée extract_base_features puis peut
-    ajouter des features spécifiques à la détection de voiture.
-    
+
+    Utilise extract_all_features qui combine :
+    - Features de base (MFCC, spectral, temporel)
+    - Features spécifiques véhicules (basses fréquences, delta MFCC, etc.)
+
     Paramètres:
         file_path (str): Chemin vers le fichier audio
-    
+
     Retourne:
         dict: Dictionnaire des features, ou None si erreur
     """
     try:
         # Charger et normaliser l'audio
         y, sr = load_audio(file_path)
-        
+        # Limiter à 4s pour uniformité et performance
+        max_samples = int(4.0 * sr)
+        if len(y) > max_samples:
+            y = y[:max_samples]
+
         if len(y) == 0:
             return None
-        
+
         y = normalize_audio(y)
-        
-        # Extraire les features de base
-        features = extract_base_features(y, sr)
-        
-        # Ici on pourrait ajouter des features spécifiques à la détection
-        # de voiture si nécessaire (ex: analyse basse fréquence moteur)
-        
+
+        # Extraire toutes les features (base + véhicule)
+        features = extract_all_features(y, sr)
+
         return features
-        
+
     except Exception as e:
         print_error(f"Erreur sur {file_path}: {e}")
         return None

@@ -1,0 +1,21 @@
+{
+  "sr": 22050,
+  "duration": 4.0,
+  "n_mels": 128,
+  "n_fft": 2048,
+  "hop_length": 512,
+  "X_mean": -30.127754048273783,
+  "X_std": 11.869417203287593,
+  "input_shape": [
+    128,
+    173,
+    1
+  ],
+  "n_samples": 28844,
+  "cv_f1_mean": 0.7333752558315707,
+  "cv_f1_std": 0.03226893834855521,
+  "class_distribution": {
+    "voiture": 14422,
+    "pas_voiture": 14422
+  }
+}

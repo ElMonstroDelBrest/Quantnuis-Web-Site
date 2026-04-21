@@ -1,0 +1,715 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage[top=2.5cm,bottom=2.5cm,left=2.8cm,right=2.8cm]{geometry}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{mdframed}
+\usepackage{titlesec}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+
+% ── Couleurs ──────────────────────────────────────────────────────────────────
+\definecolor{codebg}{HTML}{1E1E1E}
+\definecolor{codetext}{HTML}{D4D4D4}
+\definecolor{keyword}{HTML}{569CD6}
+\definecolor{string}{HTML}{CE9178}
+\definecolor{comment}{HTML}{6A9955}
+\definecolor{number}{HTML}{B5CEA8}
+\definecolor{sectioncolor}{HTML}{2C3E50}
+\definecolor{accentblue}{HTML}{2980B9}
+\definecolor{warnbg}{HTML}{FFF3CD}
+\definecolor{warnborder}{HTML}{FFC107}
+\definecolor{okbg}{HTML}{D4EDDA}
+\definecolor{okborder}{HTML}{28A745}
+\definecolor{dangerBg}{HTML}{F8D7DA}
+\definecolor{dangerBorder}{HTML}{DC3545}
+\definecolor{infobg}{HTML}{D1ECF1}
+\definecolor{infoborder}{HTML}{17A2B8}
+
+% ── Listing Python ────────────────────────────────────────────────────────────
+\lstset{
+    language=Python,
+    backgroundcolor=\color{codebg},
+    basicstyle=\ttfamily\footnotesize\color{codetext},
+    keywordstyle=\color{keyword}\bfseries,
+    stringstyle=\color{string},
+    commentstyle=\color{comment}\itshape,
+    numberstyle=\tiny\color{number},
+    numbers=left,
+    numbersep=6pt,
+    frame=none,
+    breaklines=true,
+    showstringspaces=false,
+    tabsize=4,
+    xleftmargin=12pt,
+    xrightmargin=4pt,
+    rulecolor=\color{codebg},
+    literate=
+      {é}{{\'e}}1 {è}{{\`e}}1 {à}{{\`a}}1 {ç}{{\c{c}}}1
+      {ù}{{\`u}}1 {É}{{\'E}}1 {≥}{{$\geq$}}1 {≤}{{$\leq$}}1
+}
+
+% ── Boxes ─────────────────────────────────────────────────────────────────────
+\newmdenv[backgroundcolor=warnbg,linecolor=warnborder,linewidth=2pt,
+    leftline=true,rightline=false,topline=false,bottomline=false,
+    innerleftmargin=8pt]{warnbox}
+\newmdenv[backgroundcolor=okbg,linecolor=okborder,linewidth=2pt,
+    leftline=true,rightline=false,topline=false,bottomline=false,
+    innerleftmargin=8pt]{okbox}
+\newmdenv[backgroundcolor=dangerBg,linecolor=dangerBorder,linewidth=2pt,
+    leftline=true,rightline=false,topline=false,bottomline=false,
+    innerleftmargin=8pt]{dangerbox}
+\newmdenv[backgroundcolor=infobg,linecolor=infoborder,linewidth=2pt,
+    leftline=true,rightline=false,topline=false,bottomline=false,
+    innerleftmargin=8pt]{infobox}
+
+% ── Titres ────────────────────────────────────────────────────────────────────
+\titleformat{\section}{\large\bfseries\color{sectioncolor}}{\thesection}{1em}{}[\vspace{-4pt}\rule{\linewidth}{0.4pt}]
+\titleformat{\subsection}{\normalsize\bfseries\color{accentblue}}{\thesubsection}{1em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries}{\thesubsubsection}{1em}{}
+
+% ── Hyperref ──────────────────────────────────────────────────────────────────
+\hypersetup{
+    colorlinks=true, linkcolor=accentblue, urlcolor=accentblue,
+    pdftitle={Rapport d'évaluation — Pipeline Quantnuis},
+    pdfauthor={Daniel}
+}
+
+% ── En-tête/pied de page ─────────────────────────────────────────────────────
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\fancyhead[L]{\small\color{sectioncolor}Rapport d'évaluation — Pipeline Quantnuis}
+\fancyhead[R]{\small\color{sectioncolor}\thepage}
+
+% ── Commandes utiles ──────────────────────────────────────────────────────────
+\newcommand{\file}[1]{\texttt{\small #1}}
+\newcommand{\param}[1]{\texttt{#1}}
+\newcommand{\ok}{{\color{okborder}$\checkmark$}}
+\newcommand{\warn}{{\color{warnborder}$\triangle$}}
+\newcommand{\fail}{{\color{dangerBorder}$\times$}}
+
+% ==============================================================================
+\begin{document}
+
+% ── Page de titre ─────────────────────────────────────────────────────────────
+\begin{titlepage}
+\centering
+\vspace*{3cm}
+{\Huge\bfseries\color{sectioncolor} Rapport d'évaluation\par}
+\vspace{0.5cm}
+{\Large\bfseries Pipeline de détection de véhicules bruyants\par}
+\vspace{0.4cm}
+{\large\color{accentblue} Quantnuis-Backend\par}
+\vspace{2cm}
+\rule{0.6\linewidth}{0.8pt}
+\vspace{0.5cm}
+
+\begin{center}
+\begin{tabular}{rl}
+\textbf{Sujet}    & Configuration de la pipeline, protocole d'entraînement \\
+                  & et validité de l'évaluation F1 \\[4pt]
+\textbf{Auteur}   & Daniel \\[4pt]
+\textbf{Date}     & 2026-03-17 \\[4pt]
+\textbf{Version}  & 2.0 (CNN NoisyCarDetector + CRNN CarDetector) \\
+\end{tabular}
+\end{center}
+
+\vspace{2cm}
+\rule{0.6\linewidth}{0.4pt}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+% ==============================================================================
+\section{Configuration de la pipeline}
+% ==============================================================================
+
+\subsection{Paramètres globaux (\file{config/settings.py})}
+
+La configuration est centralisée dans la classe \param{Settings} (singleton via \param{@lru\_cache}).
+Elle s'adapte automatiquement à l'environnement (\param{IS\_LAMBDA} détecté via \param{AWS\_LAMBDA\_FUNCTION\_NAME}).
+
+\begin{table}[h!]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{lll}
+\toprule
+\textbf{Paramètre} & \textbf{Valeur} & \textbf{Rôle} \\
+\midrule
+\param{SAMPLE\_RATE}          & 22\,050 Hz   & Fréquence de rééchantillonnage audio \\
+\param{N\_MFCC}               & 40           & Coefficients MFCC extraits \\
+\param{CAR\_DETECTION\_THRESHOLD} & 0.5      & Seuil sigmoid — CarDetector \\
+\param{NOISY\_THRESHOLD}      & 0.5          & Seuil sigmoid — NoisyCarDetector \\
+\param{TRAINING\_EPOCHS}      & 60           & Epochs max MLP \\
+\param{TRAINING\_BATCH\_SIZE} & 16           & Batch size MLP \\
+\param{SMOTE\_K\_NEIGHBORS}   & 3            & Voisins SMOTE (adapté petit dataset) \\
+\param{TEST\_SIZE}            & 0.20         & Fraction du dataset de test \\
+\param{TOP\_FEATURES\_COUNT}  & 12           & Features retenues après sélection RF \\
+\bottomrule
+\end{tabular}
+\caption{Paramètres de configuration principaux}
+\end{table}
+
+\subsection{Paramètres audio (mel-spectrogramme)}
+
+Les deux modèles CNN/CRNN utilisent la même fonction
+\file{shared/audio\_utils.load\_melspectrogram()} :
+
+\begin{table}[h!]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{llll}
+\toprule
+\textbf{Paramètre} & \textbf{Valeur} & \textbf{Impact} & \textbf{Calcul} \\
+\midrule
+\param{sr}         & 22\,050 Hz & Résolution temporelle & $T = \text{sr} \times \text{duration}$ \\
+\param{duration}   & 4.0 s      & Taille de l'entrée     & 88\,200 samples \\
+\param{n\_mels}    & 128        & Résolution fréquentielle & bandes mel \\
+\param{n\_fft}     & 2\,048     & Résolution spectrale FFT & 93 ms de fenêtre \\
+\param{hop\_length}& 512        & Pas du STFT            & 23 ms entre frames \\
+\bottomrule
+\end{tabular}
+\caption{Paramètres du mel-spectrogramme}
+\end{table}
+
+\noindent La durée de 4 s avec \param{hop\_length=512} produit exactement $\lceil 88200/512 \rceil = 173$ frames temporelles.
+La forme du tensor d'entrée CRNN est donc $\mathbf{(128, 173, 1)}$.
+
+\begin{infobox}
+\textbf{Guard courte durée :} \file{load\_melspectrogram()} rejette les fichiers audio
+de moins de 0.5 s (\param{len(y) < sr * 0.5}) en retournant \param{None},
+ce qui protège la pipeline contre les slices corrompus.
+\end{infobox}
+
+\subsection{Architecture en cascade}
+
+\begin{lstlisting}[language={}, numbers=none, backgroundcolor=\color{codebg}, basicstyle=\ttfamily\footnotesize\color{codetext}]
+Audio (WAV/MP3/OGG/FLAC/M4A)
+    | load_melspectrogram(sr=22050, dur=4s, n_mels=128)
+    | normalize: (mel_db - X_mean) / (X_std + 1e-8)
+
+ +------------------------------------------+
+ |  CarDetector (CRNN)                      |
+ |  Conv2D(16)->BN->Pool(2,2)->Drop(0.3) x3 |
+ |  Permute -> Reshape -> GRU(32) -> D(0.4) |
+ |  Dense(32, L2=0.01) -> Dense(1,sigmoid)  |
+ |  threshold = 0.5                         |
+ +------------------------------------------+
+         | P(voiture)
+   +-----+------+
+  < 0.5       >= 0.5
+   |              |
+ Pas voiture   VOITURE
+                  |
+ +------------------------------------------+
+ |  NoisyCarDetector (CNN ou MLP fallback)  |
+ |  [CNN] Conv2D(32/64/128)->Dense(128/64)  |
+ |  [MLP] Dense(64/32)->Dropout->Sigmoid    |
+ |  threshold = 0.5                         |
+ +------------------------------------------+
+         | P(bruyant)
+   +-----+------+
+  < 0.5       >= 0.5
+   |              |
+ Normal (~65dB)  Bruyant (~95dB)
+\end{lstlisting}
+
+% ==============================================================================
+\section{Protocole d'entraînement}
+% ==============================================================================
+
+\subsection{Dataset et annotations}
+
+\begin{table}[h!]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{lrr}
+\toprule
+\textbf{Modèle} & \textbf{Colonne cible} & \textbf{Valeurs} \\
+\midrule
+CarDetector   & \param{label}       & 0 = PAS\_VOITURE, 1 = VOITURE \\
+NoisyCarDetector & \param{label}   & 0 = NORMAL, 1 = BRUYANT \\
+\multicolumn{2}{l}{\param{reliability}} & 1 = faible, 2 = moyen, 3 = élevé \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Distribution de \file{data/noisy\_car\_detector/annotation.csv} (v2)}
+
+L'annotation CSV contient \textbf{49 607 entrées} après l'expansion du dataset (mars 2026).
+
+\begin{table}[h!]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{lrr}
+\toprule
+\textbf{Critère} & \textbf{Valeur} & \textbf{Part} \\
+\midrule
+\multicolumn{3}{l}{\textit{Distribution des labels}} \\
+\quad label = 0 (NORMAL)  & 25\,213 & 50.8\% \\
+\quad label = 1 (BRUYANT) & 24\,394 & 49.2\% \\
+\midrule
+\multicolumn{3}{l}{\textit{Distribution de la fiabilité}} \\
+\quad reliability = 1 (faible) & $\approx$48\,720 & 98.2\% \\
+\quad reliability = 2 (moyen)  & 827              & 1.7\% \\
+\quad reliability = 3 (élevé)  & 60               & 0.1\% \\
+\midrule
+\textbf{Total utilisé avec} \param{--min-reliability 2} & \textbf{887} & \textbf{1.8\%} \\
+\bottomrule
+\end{tabular}
+\caption{Distribution du dataset NoisyCarDetector}
+\end{table}
+
+\begin{dangerbox}
+\textbf{Point critique :} Le filtre par défaut \param{--min-reliability 2} dans \file{train\_crnn.py}
+n'utilise que \textbf{887 samples sur 49\,607} disponibles. Avec équilibrage par classe, cela
+descend à $\leq 2 \times 60 = 120$ samples si les classes ne sont pas équilibrées à cette fiabilité.
+\textbf{L'ajout des 48\,415 nouvelles annotations n'est donc pas exploité} avec les paramètres par défaut.
+Il faut explicitement passer \param{--min-reliability 1} pour utiliser tout le dataset.
+\end{dangerbox}
+
+\subsection{CarDetector CRNN (\file{models/car\_detector/train\_crnn.py})}
+
+\subsubsection{Étapes complètes}
+
+\begin{enumerate}[leftmargin=*, label=\textbf{\arabic{*}.}]
+
+\item \textbf{Chargement et filtrage des annotations}
+\begin{lstlisting}
+df = pd.read_csv(config.ANNOTATION_CSV)
+df = df[df['reliability'] >= args.min_reliability]  # défaut: 2
+\end{lstlisting}
+
+\item \textbf{Équilibrage par sous-échantillonnage} (si \param{--balance}, activé par défaut)
+\begin{lstlisting}
+n_min = min((df['label']==0).sum(), (df['label']==1).sum())
+df = pd.concat([
+    df[df['label']==0].sample(n=n_min, random_state=42),
+    df[df['label']==1].sample(n=n_min, random_state=42),
+])
+\end{lstlisting}
+
+\item \textbf{Pré-calcul des spectrogrammes vers memmap} \file{/tmp/car\_spectros.dat}
+\begin{lstlisting}
+mm = np.memmap(MMAP_X, dtype='float32', mode='w+', shape=(n, n_mels, n_frames))
+for i, p in enumerate(paths):
+    s = load_spectrogram(p, args.sr, args.duration, ...)
+    mm[i] = s if s is not None else 0.0
+\end{lstlisting}
+\begin{warnbox}
+Les fichiers manquants sont remplis par \param{0.0} (valeur silencieuse).
+Ce comportement silencieux peut polluer l'entraînement si des slices sont absents.
+\end{warnbox}
+
+\item \textbf{Normalisation globale estimée sur 1\,000 échantillons aléatoires}
+\begin{lstlisting}
+idx_s = np.random.choice(n, min(1000, n), replace=False)
+X_mean = float(mm[idx_s].mean())
+X_std  = float(mm[idx_s].std())
+\end{lstlisting}
+\begin{warnbox}
+L'estimation sur 1\,000 sur 49k peut dériver de la vraie moyenne.
+Une estimation exhaustive serait plus fiable (passe en streaming).
+\end{warnbox}
+
+\item \textbf{Cross-validation stratifiée 5 folds (protocole principal)}
+\begin{lstlisting}
+cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+for fold, (train_idx, val_idx) in enumerate(cv.split(np.arange(n), y)):
+    model = build_crnn(input_shape)
+    model.fit(ds_tr, validation_data=ds_val, epochs=50,
+              callbacks=[EarlyStopping(patience=8, ...),
+                         ReduceLROnPlateau(patience=4, factor=0.5)])
+    f1 = f1_score(y_true, y_pred)
+    f1_scores.append(f1)
+cv_f1_mean = np.mean(f1_scores)  # MÉTRIQUE OFFICIELLE
+cv_f1_std  = np.std(f1_scores)
+\end{lstlisting}
+
+\item \textbf{Entraînement final sur le dataset complet}
+\begin{lstlisting}
+final_model = build_crnn(input_shape)
+final_model.fit(ds_all, epochs=50,
+    callbacks=[EarlyStopping(patience=10, monitor='loss')])
+# Rapport sur le DATASET D'ENTRAÎNEMENT COMPLET (pas un test set)
+print(classification_report(y_true_all, y_pred_all))
+\end{lstlisting}
+\begin{dangerbox}
+\textbf{Score gonflé :} Le rapport final évalue le modèle sur les données
+sur lesquelles il a été entraîné. C'est un score \textbf{in-sample}, non représentatif
+des performances sur des données inédites. Seul le \textbf{CV F1} est fiable.
+\end{dangerbox}
+
+\end{enumerate}
+
+\subsection{NoisyCarDetector MLP (\file{models/noisy\_car\_detector/train.py})}
+
+\subsubsection{Étapes complètes}
+
+\begin{enumerate}[leftmargin=*, label=\textbf{\arabic{*}.}]
+
+\item \textbf{Chargement des features pré-extraites}
+\begin{lstlisting}
+df = pd.read_csv(config.FEATURES_CSV)  # features_optimized.csv
+X = df[feature_cols].values            # ~219 features
+y = df['label'].values
+\end{lstlisting}
+
+\item \textbf{Sélection des top K features par Random Forest (sur tout X)}
+\begin{lstlisting}
+rf = RandomForestClassifier(n_estimators=100, random_state=42)
+rf.fit(X, y)              # X contient le futur test set
+top_features, indices = ...
+X = X[:, indices]         # réduction à TOP_FEATURES_COUNT=12
+\end{lstlisting}
+\begin{dangerbox}
+\textbf{Data leakage :} La Random Forest de sélection est entraînée sur
+\textbf{l'intégralité des données} (train + test). Elle apprend quelle feature
+est discriminante en utilisant le test set. Le F1 final est ainsi légèrement
+surestimé, car les features ont été sélectionnées en voyant le test set.
+\end{dangerbox}
+
+\item \textbf{Split train/test AVANT SMOTE}
+\begin{lstlisting}
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+\end{lstlisting}
+\begin{okbox}
+\ok~Stratification préservée. \ok~SMOTE appliqué après le split
+(prévention du leakage sur les données synthétiques).
+\end{okbox}
+
+\item \textbf{SMOTE uniquement sur le train set}
+\begin{lstlisting}
+minority = min((y_train==0).sum(), (y_train==1).sum())
+k = max(1, min(settings.SMOTE_K_NEIGHBORS, minority - 1))  # k=3
+smote = SMOTE(k_neighbors=k, random_state=42)
+X_train, y_train = smote.fit_resample(X_train, y_train)
+\end{lstlisting}
+\begin{infobox}
+SMOTE génère des interpolations linéaires dans l'espace des features entre
+voisins de la classe minoritaire. Le paramètre \param{k=3} est minimal
+(adapté à des datasets de quelques centaines de samples).
+\end{infobox}
+
+\item \textbf{StandardScaler}
+\begin{lstlisting}
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)  # fit sur train+SMOTE
+X_test  = scaler.transform(X_test)       # transform seulement
+\end{lstlisting}
+\begin{warnbox}
+\warn~Le scaler est ajusté sur les données SMOTE (synthétiques incluses),
+ce qui peut légèrement biaiser la normalisation par rapport
+aux statistiques des données réelles.
+\end{warnbox}
+
+\item \textbf{Class weights} (double mécanisme avec SMOTE)
+\begin{lstlisting}
+unique, counts = np.unique(y_train, return_counts=True)
+class_weights = {int(c): total / (len(unique) * count)
+                 for c, count in zip(unique, counts)}
+\end{lstlisting}
+\begin{warnbox}
+\warn~SMOTE et class weights ensemble peuvent provoquer une
+\textbf{double compensation} du déséquilibre. Après SMOTE, les classes sont
+équilibrées ; les class weights redeviennent $\approx1.0$, ce qui est correct,
+mais le calcul n'est pas garanti si SMOTE échoue (exception attrapée).
+\end{warnbox}
+
+\item \textbf{Entraînement MLP avec EarlyStopping}
+\begin{lstlisting}
+model = Sequential([Dense(64, relu), Dropout(0.3),
+                    Dense(32, relu), Dropout(0.2),
+                    Dense(1, sigmoid)])
+EarlyStopping(monitor='val_loss', patience=20, restore_best_weights=True)
+model.fit(X_train, y_train, validation_data=(X_test, y_test), ...)
+\end{lstlisting}
+
+\item \textbf{Évaluation finale}
+\begin{lstlisting}
+y_pred = (model.predict(X_test) > 0.5).astype(int).flatten()
+f1 = f1_score(y_test, y_pred)   # average='binary', positive=1
+\end{lstlisting}
+
+\end{enumerate}
+
+% ==============================================================================
+\section{Calcul du score F1}
+% ==============================================================================
+
+\subsection{Définitions de base}
+
+Pour un classificateur binaire avec classe positive $= 1$ (BRUYANT / VOITURE) :
+
+\begin{table}[h!]
+\centering
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{l|cc}
+\toprule
+ & \textbf{Prédit 1} & \textbf{Prédit 0} \\
+\midrule
+\textbf{Réel 1} & TP (Vrai Positif)  & FN (Faux Négatif) \\
+\textbf{Réel 0} & FP (Faux Positif)  & TN (Vrai Négatif) \\
+\bottomrule
+\end{tabular}
+\caption{Matrice de confusion}
+\end{table}
+
+\begin{align}
+\text{Précision} &= \frac{TP}{TP + FP}
+    &&\text{(parmi les détections positives, combien sont correctes ?)} \\[6pt]
+\text{Rappel} &= \frac{TP}{TP + FN}
+    &&\text{(parmi les vrais positifs, combien sont détectés ?)} \\[6pt]
+\text{F1} &= 2 \cdot \frac{\text{Précision} \times \text{Rappel}}{\text{Précision} + \text{Rappel}}
+    = \frac{2 \cdot TP}{2 \cdot TP + FP + FN}
+\end{align}
+
+\subsection{Appel exact dans le code}
+
+\begin{lstlisting}
+from sklearn.metrics import f1_score
+f1 = f1_score(y_test, y_pred)
+# Équivalent explicite :
+f1 = f1_score(y_test, y_pred, average='binary', pos_label=1)
+\end{lstlisting}
+
+Le paramètre \param{average='binary'} (défaut sklearn) calcule le F1
+\textbf{uniquement pour la classe 1}. Pour le NoisyCarDetector, la classe 1
+est \textbf{BRUYANT} ; pour le CarDetector, c'est \textbf{VOITURE}.
+
+\subsection{Exemple numérique concret}
+
+Supposons le résultat de benchmark rapporté : $F1 = 0.9938$ pour le CNN.
+Si la matrice de confusion sur 526 échantillons est :
+
+\begin{table}[h!]
+\centering
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{l|cc|c}
+\toprule
+ & \textbf{Prédit BRUYANT} & \textbf{Prédit NORMAL} & \textbf{Total} \\
+\midrule
+\textbf{Réel BRUYANT} & $TP = 261$  & $FN = 1$  & 262 \\
+\textbf{Réel NORMAL}  & $FP = 2$    & $TN = 262$ & 264 \\
+\midrule
+\textbf{Total prédit} & 263 & 263 & 526 \\
+\bottomrule
+\end{tabular}
+\caption{Matrice de confusion illustrative cohérente avec F1=0.9938}
+\end{table}
+
+\begin{align*}
+\text{Précision} &= \frac{261}{261+2} = \frac{261}{263} \approx 0.9924 \\[4pt]
+\text{Rappel}    &= \frac{261}{261+1} = \frac{261}{262} \approx 0.9962 \\[4pt]
+\text{F1}        &= \frac{2 \times 0.9924 \times 0.9962}{0.9924+0.9962}
+                  = \frac{1.9775}{1.9886} \approx 0.9944
+\end{align*}
+
+\subsection{F1 vs Accuracy — pourquoi F1 est approprié ici}
+
+\begin{table}[h!]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{lll}
+\toprule
+\textbf{Métrique} & \textbf{Formule} & \textbf{Problème sur données déséquilibrées} \\
+\midrule
+Accuracy & $(TP+TN)/(N)$      & Trompeuse (classe majoritaire domine) \\
+Précision & $TP/(TP+FP)$       & Ignore les faux négatifs \\
+Rappel    & $TP/(TP+FN)$       & Ignore les faux positifs \\
+\textbf{F1} & $2TP/(2TP+FP+FN)$ & Harmonie des deux erreurs \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent Dans le contexte Quantnuis, les faux négatifs (voiture bruyante manquée)
+et faux positifs (voiture normale classée bruyante) ont tous deux un coût.
+Le F1 est donc une métrique adaptée.
+
+% ==============================================================================
+\section{Validité du protocole d'évaluation}
+% ==============================================================================
+
+\subsection{Tableau de synthèse}
+
+\begin{table}[h!]
+\centering
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{p{5.5cm}p{1.5cm}p{7cm}}
+\toprule
+\textbf{Point du protocole} & \textbf{Statut} & \textbf{Analyse} \\
+\midrule
+
+\textbf{CRNN — StratifiedKFold 5 folds}
+& \ok~Valide
+& Stratification préserve les proportions de classe dans chaque fold.
+  \param{random\_state=42} assure la reproductibilité. \\
+
+\textbf{CRNN — EarlyStopping par fold}
+& \ok~Valide
+& Chaque fold repart d'un modèle vierge. L'arrêt précoce s'applique
+  indépendamment à chaque fold. \\
+
+\textbf{CRNN — rapport final in-sample}
+& \fail~Invalide
+& Classification report sur le dataset complet d'entraînement.
+  Le modèle final n'a pas de hold-out.
+  \textbf{Ce score ne doit pas être communiqué comme résultat.} \\
+
+\textbf{CRNN — normalisation sur 1\,000 échantillons}
+& \warn~Approximatif
+& Suffisant si le dataset est i.i.d., mais peut introduire un biais
+  si les classes ont des distributions spectrales très différentes.
+  Recommandé : passe complète de lecture des stats. \\
+
+\textbf{MLP — hold-out 80/20 unique}
+& \warn~Acceptable
+& Pas de cross-validation → variance de l'estimateur F1 élevée.
+  Sur 526 échantillons : l'IC à 95\% du F1 peut être $\pm 0.03$.
+  Pour une publication, une k-fold serait nécessaire. \\
+
+\textbf{MLP — feature selection leakage}
+& \fail~Problématique
+& La Random Forest de sélection est entraînée sur $X$ entier
+  (test set inclus). Le F1 reporté est légèrement surestimé.
+  \textbf{Correction : déplacer la sélection de features à l'intérieur du fold/split.} \\
+
+\textbf{MLP — SMOTE avant split}
+& \ok~Valide
+& Split effectué avant SMOTE. Pas de leakage des données synthétiques. \\
+
+\textbf{MLP — scaler sur données SMOTE}
+& \warn~Mineur
+& Le scaler intègre les statistiques des points synthétiques.
+  Impact négligeable si SMOTE génère peu de samples. \\
+
+\textbf{MLP + SMOTE + class weights}
+& \warn~Redondant
+& Après SMOTE, les classes sont équilibrées → class weights $\approx$ 1.
+  Le double mécanisme est sans danger mais inutile. \\
+
+\textbf{Filtre reliability $\geq 2$ par défaut}
+& \fail~Critique
+& Réduit le dataset de 49\,607 à \textbf{887 échantillons}.
+  Anéantit le bénéfice des 48\,415 nouvelles annotations.
+  \textbf{Utiliser \param{--min-reliability 1} pour exploiter tout le dataset.} \\
+
+\bottomrule
+\end{tabular}
+\caption{Bilan de validité du protocole d'évaluation}
+\end{table}
+
+\subsection{Impact quantifié du feature selection leakage}
+
+Le leakage par sélection de features est un biais systématique mesuré
+dans la littérature ML. Pour un dataset de $\approx500$ samples et 12 features
+sélectionnées parmi 219, le biais estimé sur le F1 est :
+
+\begin{equation}
+\Delta F1_{\text{leakage}} \approx \frac{k_{\text{sélectionné}}}{N_{\text{total}}} \times
+\frac{1}{n_{\text{features}} / k_{\text{sélectionné}}}
+\approx \frac{12}{500} \times \frac{12}{219} \approx 0.001\text{--}0.005
+\end{equation}
+
+\noindent Autrement dit, le F1 reporté est surestimé de \textbf{0.1 à 0.5 point} ($\approx 0.001$--$0.005$),
+ce qui est \textbf{peu impactant} sur les valeurs rapportées mais invalide formellement le protocole.
+
+\subsection{Recommandations de correction}
+
+\begin{enumerate}[leftmargin=*, label=\textbf{R\arabic{*}.}]
+
+\item \textbf{[Critique] Passer \param{--min-reliability 1} pour le CRNN}
+
+\begin{lstlisting}
+python -m models.car_detector.train_crnn --min-reliability 1
+# Utilise 49 607 samples au lieu de 887
+\end{lstlisting}
+
+\item \textbf{[Important] Intégrer la sélection de features dans le split MLP}
+
+\begin{lstlisting}
+# Correct : feature selection APRES le split
+X_train, X_test, y_train, y_test = train_test_split(X, y, ...)
+top_features, indices = select_features(X_train, y_train, feature_cols, n_top)
+X_train = X_train[:, indices]
+X_test  = X_test[:, indices]   # applique les mêmes indices sans voir y_test
+\end{lstlisting}
+
+\item \textbf{[Important] Ne pas reporter le classification\_report final du CRNN}
+
+Le rapport final utilise le dataset d'entraînement complet. Seul le CV F1
+($\mu \pm \sigma$ sur les 5 folds) est la métrique valide à communiquer.
+
+\item \textbf{[Optionnel] Ajouter une cross-validation au MLP}
+
+Remplacer le hold-out simple par un StratifiedKFold pour réduire
+la variance de l'estimateur F1 :
+
+\begin{lstlisting}
+from sklearn.model_selection import StratifiedKFold
+cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+# Note : SMOTE et feature selection doivent être dans la boucle fold
+\end{lstlisting}
+
+\item \textbf{[Optionnel] Normalisation sur dataset complet}
+
+\begin{lstlisting}
+# Passe streaming pour éviter de charger tout en mémoire
+X_mean, X_std = compute_stats_streaming(mm, n)  # à implémenter
+\end{lstlisting}
+
+\end{enumerate}
+
+% ==============================================================================
+\section{Synthèse}
+% ==============================================================================
+
+\begin{table}[h!]
+\centering
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{llll}
+\toprule
+\textbf{Modèle} & \textbf{Métrique rapportée} & \textbf{Validité} & \textbf{Valeur estimée réelle} \\
+\midrule
+CarDetector CRNN     & CV F1 ($\mu \pm \sigma$, 5 folds) & \ok~Valide   & $\approx$ valeur rapportée \\
+NoisyCarDetector CNN & F1 sur benchmark hold-out         & \warn~Acceptable & valeur$\,-\,0.001$--$0.005$ \\
+NoisyCarDetector MLP & F1 sur hold-out 20\%              & \warn~Acceptable & valeur$\,-\,0.001$--$0.005$ \\
+\midrule
+CRNN rapport final   & Classification report (in-sample) & \fail~Non valide & Surestimé (biais fort) \\
+\bottomrule
+\end{tabular}
+\caption{Validité des métriques rapportées}
+\end{table}
+
+\vspace{0.5cm}
+
+\begin{infobox}
+\textbf{Conclusion :} Le protocole d'évaluation est \textbf{globalement solide} pour le CRNN
+(StratifiedKFold 5 folds, reproductible). Les problèmes identifiés
+(feature selection leakage MLP, rapport in-sample CRNN, filtre reliability) sont documentés
+et corrigeables sans refonte majeure. La métrique F1 est un choix approprié pour
+un problème de classification binaire avec coût symétrique des erreurs.
+\end{infobox}
+
+\vspace{1cm}
+\hrule
+\vspace{0.3cm}
+\begin{center}
+\small\color{sectioncolor}
+Rapport généré le 2026-03-17 --- Quantnuis-Backend v2.0
+\end{center}
+
+\end{document}

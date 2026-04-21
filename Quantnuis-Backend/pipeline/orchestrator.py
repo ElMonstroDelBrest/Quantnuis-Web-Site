@@ -99,9 +99,8 @@ class PipelineResult:
     noisy_probability: Optional[float] = None
     
     # Métadonnées
-    estimated_db: Optional[int] = None
     message: str = ""
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Convertit le résultat en dictionnaire."""
         return {
@@ -111,7 +110,6 @@ class PipelineResult:
             "is_noisy": self.is_noisy,
             "noisy_confidence": self.noisy_confidence,
             "noisy_probability": self.noisy_probability,
-            "estimated_db": self.estimated_db,
             "message": self.message
         }
     
@@ -123,7 +121,7 @@ class PipelineResult:
         """
         # Déterminer si c'est bruyant (voiture détectée ET bruyante)
         has_noisy_vehicle = self.car_detected and (self.is_noisy or False)
-        
+
         # Confiance à utiliser
         if has_noisy_vehicle:
             confidence = (self.noisy_confidence or 0) / 100.0
@@ -131,14 +129,11 @@ class PipelineResult:
             confidence = self.car_confidence / 100.0
         else:
             confidence = (100 - self.car_confidence) / 100.0
-        
-        # Estimation décibels
-        max_db = self.estimated_db or (95 if has_noisy_vehicle else 60)
-        
+
         return {
             "hasNoisyVehicle": has_noisy_vehicle,
+            "carDetected": self.car_detected,
             "confidence": confidence,
-            "maxDecibels": max_db,
             "message": self.message
         }
 
@@ -180,11 +175,10 @@ class Pipeline:
         # Le modèle noisy_car n'est chargé que si car_detector fonctionne
         noisy_loaded = self.noisy_car_detector.load()
         
-        # On peut continuer même si noisy_car n'est pas disponible
-        # (on retournera juste le résultat de car_detector)
-        self._models_loaded = car_loaded
-        
-        return car_loaded
+        # Pipeline works if at least one model is available
+        self._models_loaded = car_loaded or noisy_loaded
+
+        return self._models_loaded
     
     def analyze(self, audio_path: str, verbose: bool = False) -> PipelineResult:
         """
@@ -212,30 +206,37 @@ class Pipeline:
         # ======================================================================
         # ÉTAPE 1 : DÉTECTION VOITURE
         # ======================================================================
-        
+
         if verbose:
             print_header("Étape 1 - Détection Voiture")
-        
-        car_label, car_confidence, car_prob = self.car_detector.predict_file(
-            audio_path, verbose=verbose
-        )
-        
-        car_detected = (car_label == self.car_detector.positive_label)
-        
+
+        if self.car_detector.is_loaded:
+            car_label, car_confidence, car_prob = self.car_detector.predict_file(
+                audio_path, verbose=verbose
+            )
+            car_detected = (car_label == self.car_detector.positive_label)
+        else:
+            # Car detector not available — assume car present, skip to noise analysis
+            car_detected = True
+            car_confidence = 0.0
+            car_prob = 0.0
+            if verbose:
+                print_warning("CarDetector non disponible, passage direct à l'analyse bruit")
+
         if verbose:
             if car_detected:
                 print_success(f"Voiture détectée ({car_confidence:.1f}%)")
             else:
                 print_info(f"Pas de voiture ({car_confidence:.1f}%)")
-        
+
         # Si pas de voiture, on s'arrête là
         if not car_detected:
             message = f"Pas de voiture détectée (confiance: {car_confidence:.1f}%)"
-            
+
             if verbose:
                 print_header("Résultat Final")
                 print_info(message)
-            
+
             return PipelineResult(
                 car_detected=False,
                 car_confidence=car_confidence,
@@ -267,27 +268,23 @@ class Pipeline:
         noisy_label, noisy_confidence, noisy_prob = self.noisy_car_detector.predict_file(
             audio_path, verbose=verbose
         )
-        
+
         is_noisy = (noisy_label == self.noisy_car_detector.positive_label)
-        
-        # Estimation décibels (simplifiée)
-        estimated_db = 95 if is_noisy else 65
-        
+
         # ======================================================================
         # RÉSULTAT FINAL
         # ======================================================================
-        
+
         if is_noisy:
             message = f"🚗💨 VOITURE BRUYANTE détectée ! (confiance: {noisy_confidence:.1f}%)"
         else:
             message = f"🚗 Voiture détectée, niveau sonore NORMAL (confiance: {noisy_confidence:.1f}%)"
-        
+
         if verbose:
             print_header("Résultat Final")
-            self._display_final_result(car_detected, is_noisy, 
-                                       car_confidence, noisy_confidence, 
-                                       estimated_db)
-        
+            self._display_final_result(car_detected, is_noisy,
+                                       car_confidence, noisy_confidence)
+
         return PipelineResult(
             car_detected=True,
             car_confidence=car_confidence,
@@ -295,15 +292,14 @@ class Pipeline:
             is_noisy=is_noisy,
             noisy_confidence=noisy_confidence,
             noisy_probability=noisy_prob,
-            estimated_db=estimated_db,
             message=message
         )
-    
+
     def _display_final_result(self, car_detected: bool, is_noisy: bool,
-                              car_conf: float, noisy_conf: float, db: int):
+                              car_conf: float, noisy_conf: float):
         """Affiche le résultat final de manière visuelle."""
         print()
-        
+
         if car_detected and is_noisy:
             color = Colors.RED
             emoji = "⚠"
@@ -316,20 +312,19 @@ class Pipeline:
             color = Colors.CYAN
             emoji = "○"
             label = "PAS DE VOITURE"
-        
+
         print(f"    {color}{Colors.BOLD}┌───────────────────────────────────────┐{Colors.END}")
         print(f"    {color}{Colors.BOLD}│                                       │{Colors.END}")
         print(f"    {color}{Colors.BOLD}│   {emoji}  {label:^28}  {emoji}   │{Colors.END}")
         print(f"    {color}{Colors.BOLD}│                                       │{Colors.END}")
-        
+
         if car_detected:
             print(f"    {color}{Colors.BOLD}│   Détection voiture: {car_conf:>5.1f}%           │{Colors.END}")
             if is_noisy is not None:
                 print(f"    {color}{Colors.BOLD}│   Analyse bruit:     {noisy_conf:>5.1f}%           │{Colors.END}")
-                print(f"    {color}{Colors.BOLD}│   Niveau estimé:     ~{db} dB           │{Colors.END}")
         else:
             print(f"    {color}{Colors.BOLD}│   Confiance:         {car_conf:>5.1f}%           │{Colors.END}")
-        
+
         print(f"    {color}{Colors.BOLD}│                                       │{Colors.END}")
         print(f"    {color}{Colors.BOLD}└───────────────────────────────────────┘{Colors.END}")
         print()

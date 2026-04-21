@@ -32,8 +32,9 @@ class User(UserBase):
     """Schéma de réponse pour un utilisateur."""
     id: int
     is_active: bool
+    is_admin: bool = False
     created_at: datetime
-    
+
     class Config:
         from_attributes = True
 
@@ -90,7 +91,6 @@ class NoisyCarAnalysisBase(BaseModel):
     is_noisy: bool
     confidence: float
     probability: float
-    estimated_db: Optional[int] = None
 
 
 class NoisyCarAnalysisCreate(NoisyCarAnalysisBase):
@@ -128,8 +128,7 @@ class PipelineResult(BaseModel):
     is_noisy: Optional[bool] = None
     noisy_confidence: Optional[float] = None
     noisy_probability: Optional[float] = None
-    estimated_db: Optional[int] = None
-    
+
     # Résumé
     message: str
     
@@ -142,8 +141,8 @@ class PipelineResultSimplified(BaseModel):
     Version simplifiée du résultat pour compatibilité avec l'ancien format.
     """
     hasNoisyVehicle: bool
+    carDetected: bool
     confidence: float
-    maxDecibels: int
     message: str
 
 
@@ -175,7 +174,7 @@ class GlobalStats(BaseModel):
 class HistoryEntry(BaseModel):
     """
     Entrée dans l'historique d'un utilisateur.
-    
+
     Format compatible avec le frontend existant.
     """
     id: int
@@ -183,6 +182,104 @@ class HistoryEntry(BaseModel):
     timestamp: datetime
     is_noisy: bool  # Résultat final (voiture bruyante ou non)
     confidence: float  # Confiance en pourcentage (0-100)
-    
+
     class Config:
         from_attributes = True
+
+
+# ==============================================================================
+# SCHÉMAS ANNOTATION REQUEST
+# ==============================================================================
+
+class AnnotationData(BaseModel):
+    """Données d'une annotation individuelle."""
+    start: str  # Format HH:MM:SS
+    end: str
+    label: str
+    reliability: int = 3
+    note: Optional[str] = None
+
+
+class AnnotationRequestCreate(BaseModel):
+    """Schéma pour soumettre une demande d'annotation."""
+    model_type: str  # "car" ou "noisy_car"
+    annotations: List[AnnotationData]
+
+
+class AnnotationRequestResponse(BaseModel):
+    """Schéma de réponse pour une demande d'annotation."""
+    id: int
+    filename: str
+    model_type: str
+    status: str
+    annotation_count: int
+    total_duration: Optional[float] = None
+    created_at: datetime
+    reviewed_at: Optional[datetime] = None
+    admin_note: Optional[str] = None
+    submitted_by_email: Optional[str] = None
+    reviewed_by_email: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+
+class AnnotationRequestReview(BaseModel):
+    """Schéma pour l'action d'un admin sur une demande."""
+    action: str  # "approve" ou "reject"
+    note: Optional[str] = None
+
+
+class AnnotationRequestStats(BaseModel):
+    """Statistiques des demandes d'annotations."""
+    total_pending: int
+    total_approved: int
+    total_rejected: int
+    total_annotations_integrated: int
+
+
+# ==============================================================================
+# SCHÉMAS AUDIO REVIEW
+# ==============================================================================
+
+class AudioReviewResponse(BaseModel):
+    """Schéma de réponse pour une revue audio IA."""
+    id: int
+    s3_key: str
+    car_detected: bool
+    car_confidence: float
+    car_probability: float
+    is_noisy: Optional[bool] = None
+    noisy_confidence: Optional[float] = None
+    noisy_probability: Optional[float] = None
+    review_status: str
+    reviewer_comment: Optional[str] = None
+    analyzed_at: datetime
+    reviewed_at: Optional[datetime] = None
+    audio_url: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+
+class AudioReviewListResponse(BaseModel):
+    """Réponse paginée pour la liste des revues audio."""
+    reviews: List[AudioReviewResponse]
+    total: int
+    page: int
+    page_size: int
+
+
+class AudioReviewValidation(BaseModel):
+    """Schéma pour valider/corriger une revue audio."""
+    status: str  # "confirmed" ou "corrected"
+    comment: Optional[str] = None
+
+
+class AudioReviewStats(BaseModel):
+    """Statistiques des revues audio IA."""
+    total: int
+    pending: int
+    confirmed: int
+    corrected: int
+    accuracy_rate: Optional[float] = None

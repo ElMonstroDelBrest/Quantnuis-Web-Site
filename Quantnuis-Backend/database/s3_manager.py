@@ -15,7 +15,7 @@ import boto3
 from botocore.exceptions import ClientError
 
 from config import get_settings
-from shared import print_info, print_success, print_warning, print_error
+from shared.logger import print_info, print_success, print_warning, print_error
 
 settings = get_settings()
 

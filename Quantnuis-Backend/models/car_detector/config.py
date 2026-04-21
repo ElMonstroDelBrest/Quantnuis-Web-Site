@@ -37,6 +37,17 @@ FEATURES_PATH = settings.CAR_FEATURES_PATH
 
 
 # ==============================================================================
+# CRNN SUR MEL-SPECTROGRAMMES (nouveau modèle)
+# ==============================================================================
+
+CRNN_MODEL_PATH = ARTIFACTS_DIR / "crnn_car_detector.h5"
+"""Chemin du modèle CRNN .h5"""
+
+CRNN_CONFIG_PATH = ARTIFACTS_DIR / "crnn_config.json"
+"""Chemin de la config CRNN (normalisation, paramètres spectrogramme)"""
+
+
+# ==============================================================================
 # DONNÉES D'ENTRAÎNEMENT
 # ==============================================================================
 

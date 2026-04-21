@@ -1,0 +1,60 @@
+# Python
+**/venv/
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+*.egg-info/
+
+# Environment / Secrets
+**/.env
+**/.env.local
+**/.env.*.local
+
+# Node
+**/node_modules/
+**/dist/
+
+# LaTeX build artifacts
+rapport/*.aux
+rapport/*.log
+rapport/*.nav
+rapport/*.out
+rapport/*.snm
+rapport/*.toc
+rapport/*.bbl
+rapport/*.blg
+rapport/*.lof
+rapport/*.lot
+rapport/*.fls
+rapport/*.fdb_latexmk
+rapport/*.synctex.gz
+
+# Screenshots / temporary
+screenshots/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Internal tooling / IDE config
+_bmad/
+.claude/
+
+# PDF exports and temp docs
+*.pdf
+debate-p2-design.md
+
+# Jupyter / notebooks
+**/notebooks/
+**/reports/
+
+# LaTeX / rapport / docs non-projet
+rapport/
+docs/
+YAMNet.md
+MODEL_PARAMETERS.md
+PERFORMANCE_REVIEW.md
+
+# Docs générés par agents IA
+**/docs/rapport_technique_complet.md
+**/SECURITY_AUDIT.md

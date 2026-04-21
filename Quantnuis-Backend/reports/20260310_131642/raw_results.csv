@@ -1,0 +1,201 @@
+file,case,expected_car,expected_noisy,pred_car,car_prob,pred_noisy,noisy_prob,latency,error
+slice_886.wav,Voitures bruyantes,True,True,True,0.9959086775779724,True,1.0,0.4489312171936035,False
+slice_683.wav,Voitures bruyantes,True,True,True,0.9915341138839722,True,1.0,0.09087872505187988,False
+slice_1006.wav,Voitures bruyantes,True,True,True,0.9961159825325012,True,1.0,0.08698034286499023,False
+slice_1164.wav,Voitures bruyantes,True,True,True,0.9975535273551941,True,1.0,0.09568238258361816,False
+slice_800.wav,Voitures bruyantes,True,True,True,0.9985362887382507,True,1.0,0.0907745361328125,False
+slice_887.wav,Voitures bruyantes,True,True,True,0.9981003999710083,True,0.9999997019767761,0.09215807914733887,False
+slice_835.wav,Voitures bruyantes,True,True,True,0.9989362359046936,True,1.0,0.09071135520935059,False
+slice_724.wav,Voitures bruyantes,True,True,True,0.9975269436836243,True,1.0,0.09407472610473633,False
+slice_1069.wav,Voitures bruyantes,True,True,True,0.9971896409988403,True,1.0,0.09489321708679199,False
+slice_615.wav,Voitures bruyantes,True,True,True,0.9982771277427673,True,1.0,0.09402751922607422,False
+slice_606.wav,Voitures bruyantes,True,True,True,0.9927195310592651,True,1.0,0.08232879638671875,False
+slice_789.wav,Voitures bruyantes,True,True,True,0.9984455704689026,True,0.9999998807907104,0.08228302001953125,False
+slice_879.wav,Voitures bruyantes,True,True,True,0.9955109357833862,True,1.0,0.09093022346496582,False
+slice_746.wav,Voitures bruyantes,True,True,True,0.9967876076698303,True,1.0,0.08778810501098633,False
+slice_736.wav,Voitures bruyantes,True,True,True,0.9942377805709839,True,1.0,0.09894657135009766,False
+slice_588.wav,Voitures bruyantes,True,True,True,0.9945011734962463,True,1.0,0.08949494361877441,False
+slice_579.wav,Voitures bruyantes,True,True,True,0.9800381660461426,True,0.999991774559021,0.09851503372192383,False
+slice_1127.wav,Voitures bruyantes,True,True,True,0.9964436292648315,True,1.0,0.09070134162902832,False
+slice_824.wav,Voitures bruyantes,True,True,True,0.996337890625,True,1.0,0.08176398277282715,False
+slice_680.wav,Voitures bruyantes,True,True,True,0.9976289868354797,True,1.0,0.08664321899414062,False
+slice_634.wav,Voitures bruyantes,True,True,True,0.9949175119400024,True,1.0,0.08947920799255371,False
+slice_1136.wav,Voitures bruyantes,True,True,True,0.9975300431251526,True,1.0,0.09189677238464355,False
+slice_885.wav,Voitures bruyantes,True,True,True,0.997269868850708,True,1.0,0.11079788208007812,False
+slice_859.wav,Voitures bruyantes,True,True,True,0.9975220561027527,True,0.999999463558197,0.10132980346679688,False
+slice_1160.wav,Voitures bruyantes,True,True,True,0.9963748455047607,True,1.0,0.0880279541015625,False
+slice_1004.wav,Voitures bruyantes,True,True,True,0.9959596991539001,True,0.9999998807907104,0.09995222091674805,False
+slice_781.wav,Voitures bruyantes,True,True,True,0.9980654716491699,True,1.0,0.10329699516296387,False
+slice_1177.wav,Voitures bruyantes,True,True,True,0.9988839030265808,True,1.0,0.09244227409362793,False
+slice_968.wav,Voitures bruyantes,True,True,True,0.9976663589477539,True,1.0,0.09565567970275879,False
+slice_601.wav,Voitures bruyantes,True,True,True,0.9923501014709473,True,0.9999998807907104,0.0914926528930664,False
+slice_961.wav,Voitures bruyantes,True,True,True,0.9976717233657837,True,0.9999998211860657,0.0975947380065918,False
+slice_1129.wav,Voitures bruyantes,True,True,True,0.9986079335212708,True,1.0,0.0988607406616211,False
+slice_1167.wav,Voitures bruyantes,True,True,True,0.9970048069953918,True,1.0,0.0979914665222168,False
+slice_660.wav,Voitures bruyantes,True,True,True,0.9970964193344116,True,1.0,0.0917048454284668,False
+slice_661.wav,Voitures bruyantes,True,True,True,0.996780514717102,True,1.0,0.11134481430053711,False
+slice_626.wav,Voitures bruyantes,True,True,True,0.9910078048706055,True,1.0,0.0973513126373291,False
+slice_597.wav,Voitures bruyantes,True,True,True,0.9921014308929443,True,0.9999844431877136,0.09874200820922852,False
+slice_814.wav,Voitures bruyantes,True,True,True,0.9978266954421997,True,1.0,0.10299134254455566,False
+slice_535.wav,Voitures bruyantes,True,True,True,0.9976668357849121,True,1.0,0.09958386421203613,False
+slice_1184.wav,Voitures bruyantes,True,True,True,0.9973105788230896,True,1.0,0.10261654853820801,False
+slice_1105.wav,Voitures bruyantes,True,True,True,0.9886137247085571,True,1.0,0.09110903739929199,False
+slice_844.wav,Voitures bruyantes,True,True,True,0.9981261491775513,True,0.9999986886978149,0.1315174102783203,False
+slice_556.wav,Voitures bruyantes,True,True,True,0.9946967959403992,True,1.0,0.09773445129394531,False
+slice_918.wav,Voitures bruyantes,True,True,True,0.9965764880180359,True,0.9999996423721313,0.10281920433044434,False
+slice_1083.wav,Voitures bruyantes,True,True,True,0.9846344590187073,True,1.0,0.0932319164276123,False
+slice_992.wav,Voitures bruyantes,True,True,True,0.9950324892997742,True,1.0,0.09810614585876465,False
+slice_1151.wav,Voitures bruyantes,True,True,True,0.9931644797325134,True,0.9999995827674866,0.09508919715881348,False
+slice_643.wav,Voitures bruyantes,True,True,True,0.9963200688362122,True,1.0,0.10001659393310547,False
+slice_580.wav,Voitures bruyantes,True,True,True,0.9953127503395081,True,1.0,0.10866785049438477,False
+slice_782.wav,Voitures bruyantes,True,True,True,0.9765023589134216,True,0.9999998807907104,0.08711957931518555,False
+slice_242.wav,Voitures normales,True,False,True,0.9888516068458557,False,4.366070527339616e-07,0.7547838687896729,False
+slice_258.wav,Voitures normales,True,False,True,0.9943605661392212,False,3.042888181425951e-07,0.21158576011657715,False
+slice_149.wav,Voitures normales,True,False,True,0.8703853487968445,False,2.6426002719404096e-08,0.21366357803344727,False
+slice_203.wav,Voitures normales,True,False,True,0.9709300398826599,False,6.238457217477844e-07,0.21781635284423828,False
+slice_019.wav,Voitures normales,True,False,True,0.684374213218689,False,2.0828230633263e-12,0.21076679229736328,False
+slice_122.wav,Voitures normales,True,False,True,0.9887540340423584,False,3.956490135514912e-10,0.21446466445922852,False
+slice_195.wav,Voitures normales,True,False,True,0.9908043146133423,False,3.7108081869519083e-06,0.23679733276367188,False
+slice_082.wav,Voitures normales,True,False,True,0.9823006987571716,False,5.521743002070978e-13,0.23190903663635254,False
+slice_250.wav,Voitures normales,True,False,True,0.9927449822425842,False,0.008029256016016006,0.23353934288024902,False
+slice_150.wav,Voitures normales,True,False,True,0.969052255153656,False,4.582182276300327e-14,0.21512770652770996,False
+slice_177.wav,Voitures normales,True,False,True,0.9855072498321533,True,0.862167477607727,0.21158671379089355,False
+slice_036.wav,Voitures normales,True,False,True,0.9493106603622437,False,2.6114326629952944e-13,0.21222996711730957,False
+slice_218.wav,Voitures normales,True,False,True,0.883521318435669,False,3.6757634713779908e-09,0.21501731872558594,False
+slice_012.wav,Voitures normales,True,False,True,0.5063015222549438,False,9.536014339284193e-11,0.21201014518737793,False
+slice_074.wav,Voitures normales,True,False,True,0.9875414371490479,False,1.0944073425278589e-09,0.2301008701324463,False
+slice_202.wav,Voitures normales,True,False,True,0.9492447972297668,False,3.755358648049878e-06,0.2219712734222412,False
+slice_198.wav,Voitures normales,True,False,True,0.99555903673172,False,7.039167394395918e-05,0.20809316635131836,False
+slice_022.wav,Voitures normales,True,False,True,0.5051884651184082,False,4.784799667589823e-09,0.2126479148864746,False
+slice_169.wav,Voitures normales,True,False,True,0.9923536777496338,False,2.510468569139057e-11,0.22481513023376465,False
+slice_073.wav,Voitures normales,True,False,True,0.978246808052063,False,4.60207399965995e-10,0.22517991065979004,False
+slice_216.wav,Voitures normales,True,False,True,0.988210141658783,False,0.0004611449548974633,0.2117774486541748,False
+slice_155.wav,Voitures normales,True,False,True,0.9977216720581055,True,0.9955360293388367,0.21061253547668457,False
+slice_088.wav,Voitures normales,True,False,True,0.9864045977592468,False,6.1095422054791015e-09,0.2118823528289795,False
+slice_031.wav,Voitures normales,True,False,True,0.9665539264678955,False,7.50303410981118e-13,0.22124123573303223,False
+slice_114.wav,Voitures normales,True,False,True,0.9884592294692993,False,8.30141597824019e-12,0.20890092849731445,False
+slice_159.wav,Voitures normales,True,False,True,0.991047203540802,False,1.720341924471569e-10,0.20533299446105957,False
+slice_225.wav,Voitures normales,True,False,True,0.9963366985321045,False,0.0016329095233231783,0.21983051300048828,False
+slice_020.wav,Voitures normales,True,False,False,0.39064615964889526,,,0.10480022430419922,False
+slice_052.wav,Voitures normales,True,False,True,0.9044044613838196,False,6.927881879281728e-12,0.21402931213378906,False
+slice_166.wav,Voitures normales,True,False,True,0.9910477995872498,False,2.8705576937682054e-07,0.2172708511352539,False
+slice_119.wav,Voitures normales,True,False,True,0.9760664105415344,False,5.987744513809377e-15,0.19904732704162598,False
+slice_062.wav,Voitures normales,True,False,True,0.9811286330223083,False,4.2791956644805396e-09,0.21122384071350098,False
+slice_123.wav,Voitures normales,True,False,True,0.9823456406593323,False,3.1246893961167643e-09,0.2171180248260498,False
+slice_227.wav,Voitures normales,True,False,True,0.9956629872322083,False,4.303123932913877e-05,0.22022700309753418,False
+slice_135.wav,Voitures normales,True,False,True,0.9910188317298889,False,1.1998891880082851e-09,0.21355104446411133,False
+slice_139.wav,Voitures normales,True,False,True,0.9738008975982666,False,5.250918623522782e-12,0.21541380882263184,False
+slice_084.wav,Voitures normales,True,False,True,0.9938892126083374,False,3.263324899194231e-08,0.22560811042785645,False
+slice_146.wav,Voitures normales,True,False,True,0.9880596995353699,False,4.01439645414392e-11,0.21104073524475098,False
+slice_129.wav,Voitures normales,True,False,True,0.9910737872123718,False,1.8890321598630244e-11,0.20368432998657227,False
+slice_108.wav,Voitures normales,True,False,True,0.9893401861190796,False,3.541127568951197e-07,0.21235942840576172,False
+slice_106.wav,Voitures normales,True,False,True,0.894728422164917,False,3.4806324489267126e-10,0.20931100845336914,False
+slice_214.wav,Voitures normales,True,False,True,0.9414498805999756,False,1.1332657550156e-06,0.20336341857910156,False
+slice_128.wav,Voitures normales,True,False,True,0.9884448647499084,False,1.337287702796175e-08,0.2228100299835205,False
+slice_103.wav,Voitures normales,True,False,True,0.9802511930465698,False,2.469200524046755e-07,0.20331239700317383,False
+slice_093.wav,Voitures normales,True,False,True,0.9700050950050354,False,3.935671788468653e-10,0.2122483253479004,False
+slice_105.wav,Voitures normales,True,False,True,0.9894201755523682,False,2.798228593281493e-10,0.20589113235473633,False
+slice_148.wav,Voitures normales,True,False,True,0.9612868428230286,False,7.872431547796543e-13,0.2128591537475586,False
+slice_256.wav,Voitures normales,True,False,True,0.8276896476745605,False,0.015571004711091518,0.23404812812805176,False
+slice_096.wav,Voitures normales,True,False,True,0.9689924120903015,False,7.454922096306049e-12,0.21559667587280273,False
+slice_184.wav,Voitures normales,True,False,True,0.9855139255523682,False,3.72032671336342e-09,0.20073223114013672,False
+slice_22783.wav,Bruit / pas voiture,False,,False,0.06281046569347382,,,0.045686960220336914,False
+slice_17230.wav,Bruit / pas voiture,False,,False,0.04240019619464874,,,0.04066658020019531,False
+slice_23907.wav,Bruit / pas voiture,False,,False,0.01948751136660576,,,0.04443645477294922,False
+slice_20156.wav,Bruit / pas voiture,False,,False,0.0882488414645195,,,0.052120208740234375,False
+slice_17437.wav,Bruit / pas voiture,False,,False,0.021996814757585526,,,0.04343914985656738,False
+slice_23981.wav,Bruit / pas voiture,False,,False,0.009996592067182064,,,0.042833805084228516,False
+slice_26692.wav,Bruit / pas voiture,False,,False,0.24127888679504395,,,0.04057717323303223,False
+slice_20878.wav,Bruit / pas voiture,False,,False,0.016627589240670204,,,0.04377150535583496,False
+slice_26140.wav,Bruit / pas voiture,False,,False,0.1106063649058342,,,0.046976566314697266,False
+slice_19861.wav,Bruit / pas voiture,False,,False,0.014929501339793205,,,0.05419802665710449,False
+slice_20476.wav,Bruit / pas voiture,False,,False,0.07200975716114044,,,0.045720815658569336,False
+slice_20511.wav,Bruit / pas voiture,False,,False,0.010821148753166199,,,0.05390286445617676,False
+slice_18175.wav,Bruit / pas voiture,False,,False,0.033831775188446045,,,0.05298757553100586,False
+slice_27784.wav,Bruit / pas voiture,False,,False,0.013004439882934093,,,0.04015707969665527,False
+slice_27984.wav,Bruit / pas voiture,False,,False,0.014082774519920349,,,0.051946163177490234,False
+slice_25588.wav,Bruit / pas voiture,False,,False,0.024763623252511024,,,0.041512489318847656,False
+slice_21331.wav,Bruit / pas voiture,False,,False,0.0172874853014946,,,0.04790544509887695,False
+slice_25743.wav,Bruit / pas voiture,False,,False,0.01238310243934393,,,0.04693245887756348,False
+slice_25612.wav,Bruit / pas voiture,False,,False,0.02182326279580593,,,0.052855491638183594,False
+slice_17103.wav,Bruit / pas voiture,False,,False,0.06281089782714844,,,0.044748544692993164,False
+slice_23853.wav,Bruit / pas voiture,False,,False,0.00929551012814045,,,0.04489922523498535,False
+slice_27640.wav,Bruit / pas voiture,False,,False,0.008208469487726688,,,0.04270648956298828,False
+slice_19845.wav,Bruit / pas voiture,False,,False,0.12329771369695663,,,0.05386948585510254,False
+slice_23265.wav,Bruit / pas voiture,False,,False,0.05922001227736473,,,0.04613137245178223,False
+slice_22007.wav,Bruit / pas voiture,False,,False,0.09099148958921432,,,0.044974327087402344,False
+slice_21859.wav,Bruit / pas voiture,False,,False,0.02225663512945175,,,0.05767560005187988,False
+slice_26890.wav,Bruit / pas voiture,False,,False,0.06486577540636063,,,0.04105257987976074,False
+slice_16406.wav,Bruit / pas voiture,False,,False,0.024715589359402657,,,0.04188084602355957,False
+slice_17333.wav,Bruit / pas voiture,False,,False,0.018427228555083275,,,0.04195547103881836,False
+slice_21694.wav,Bruit / pas voiture,False,,False,0.020272890105843544,,,0.04285001754760742,False
+slice_18661.wav,Bruit / pas voiture,False,,False,0.06641290336847305,,,0.04394984245300293,False
+slice_21586.wav,Bruit / pas voiture,False,,False,0.10958722978830338,,,0.04276108741760254,False
+slice_27254.wav,Bruit / pas voiture,False,,False,0.028706595301628113,,,0.05309319496154785,False
+slice_25404.wav,Bruit / pas voiture,False,,False,0.04502236098051071,,,0.05209970474243164,False
+slice_21862.wav,Bruit / pas voiture,False,,False,0.012080412358045578,,,0.05414605140686035,False
+slice_27781.wav,Bruit / pas voiture,False,,False,0.020091738551855087,,,0.043230295181274414,False
+slice_17871.wav,Bruit / pas voiture,False,,False,0.01199856773018837,,,0.04903912544250488,False
+slice_24369.wav,Bruit / pas voiture,False,,False,0.07402850687503815,,,0.03966522216796875,False
+slice_24695.wav,Bruit / pas voiture,False,,False,0.046800341457128525,,,0.04179024696350098,False
+slice_22344.wav,Bruit / pas voiture,False,,False,0.014357226900756359,,,0.0409083366394043,False
+slice_22378.wav,Bruit / pas voiture,False,,False,0.01264551468193531,,,0.04321551322937012,False
+slice_23097.wav,Bruit / pas voiture,False,,False,0.09944535791873932,,,0.04491853713989258,False
+slice_26167.wav,Bruit / pas voiture,False,,False,0.020205117762088776,,,0.03970766067504883,False
+slice_16924.wav,Bruit / pas voiture,False,,False,0.011248473078012466,,,0.0437471866607666,False
+slice_23453.wav,Bruit / pas voiture,False,,False,0.016563013195991516,,,0.043489694595336914,False
+slice_17049.wav,Bruit / pas voiture,False,,False,0.017264526337385178,,,0.04423356056213379,False
+slice_17061.wav,Bruit / pas voiture,False,,False,0.034726306796073914,,,0.04728817939758301,False
+slice_18125.wav,Bruit / pas voiture,False,,False,0.0131505336612463,,,0.04553675651550293,False
+slice_18718.wav,Bruit / pas voiture,False,,False,0.015216655097901821,,,0.05017709732055664,False
+slice_15684.wav,Bruit / pas voiture,False,,False,0.1425153911113739,,,0.04360771179199219,False
+slice_248.wav,Voitures (car_det),True,,True,0.9887208342552185,False,1.5363730199169368e-05,0.20555830001831055,False
+slice_064.wav,Voitures (car_det),True,,True,0.943727433681488,False,1.7821211173441043e-08,0.20091867446899414,False
+slice_1798.wav,Voitures (car_det),True,,True,0.9988558888435364,True,0.9999998807907104,0.08605170249938965,False
+slice_1439.wav,Voitures (car_det),True,,True,0.9923501014709473,True,0.9999998807907104,0.10194826126098633,False
+slice_257.wav,Voitures (car_det),True,,True,0.97697913646698,False,5.2801649275124873e-08,0.22315669059753418,False
+slice_659.wav,Voitures (car_det),True,,False,0.2897847294807434,,,0.04117012023925781,False
+slice_1530.wav,Voitures (car_det),True,,True,0.9950819611549377,True,1.0,0.08980441093444824,False
+slice_2021.wav,Voitures (car_det),True,,True,0.9973402619361877,True,1.0,0.08892607688903809,False
+slice_598.wav,Voitures (car_det),True,,True,0.7421446442604065,False,0.11870233714580536,0.087249755859375,False
+slice_1897.wav,Voitures (car_det),True,,True,0.9951780438423157,True,1.0,0.09779739379882812,False
+slice_563.wav,Voitures (car_det),True,,True,0.7589605450630188,False,1.2419311133271549e-05,0.10750818252563477,False
+slice_502.wav,Voitures (car_det),True,,True,0.5122337341308594,False,0.0001101548841688782,0.0898895263671875,False
+slice_1905.wav,Voitures (car_det),True,,True,0.9970759749412537,True,0.9999994039535522,0.08673977851867676,False
+slice_1412.wav,Voitures (car_det),True,,True,0.9541240334510803,True,1.0,0.08818483352661133,False
+slice_1585.wav,Voitures (car_det),True,,True,0.9984514713287354,True,1.0,0.09412980079650879,False
+slice_579.wav,Voitures (car_det),True,,True,0.738502562046051,False,0.00013682377175427973,0.08946442604064941,False
+slice_218.wav,Voitures (car_det),True,,True,0.883521318435669,False,3.6757634713779908e-09,0.2085423469543457,False
+slice_192.wav,Voitures (car_det),True,,True,0.9925636053085327,False,9.819503543617714e-11,0.22384333610534668,False
+slice_636.wav,Voitures (car_det),True,,True,0.9368160963058472,False,9.96216622297652e-05,0.09079408645629883,False
+slice_1601.wav,Voitures (car_det),True,,True,0.997077226638794,True,1.0,0.09310436248779297,False
+slice_478.wav,Voitures (car_det),True,,True,0.8770115971565247,False,5.552141828957247e-06,0.09378457069396973,False
+slice_169.wav,Voitures (car_det),True,,True,0.9923536777496338,False,2.510468569139057e-11,0.21234130859375,False
+slice_1787.wav,Voitures (car_det),True,,True,0.9984674453735352,True,0.9999995231628418,0.10692453384399414,False
+slice_1582.wav,Voitures (car_det),True,,True,0.9959959983825684,True,0.9999999403953552,0.09709548950195312,False
+slice_1983.wav,Voitures (car_det),True,,True,0.9972462058067322,True,1.0,0.08793425559997559,False
+slice_1416.wav,Voitures (car_det),True,,True,0.9973310232162476,True,1.0,0.09151768684387207,False
+slice_1805.wav,Voitures (car_det),True,,True,0.9976415634155273,True,1.0,0.09882450103759766,False
+slice_1532.wav,Voitures (car_det),True,,True,0.995391309261322,True,1.0,0.10368108749389648,False
+slice_1438.wav,Voitures (car_det),True,,True,0.9966473579406738,True,0.9999999403953552,0.08594870567321777,False
+slice_110.wav,Voitures (car_det),True,,True,0.9897833466529846,False,2.9687788338783605e-10,0.20401239395141602,False
+slice_149.wav,Voitures (car_det),True,,True,0.8703853487968445,False,2.6426002719404096e-08,0.2259993553161621,False
+slice_1870.wav,Voitures (car_det),True,,True,0.9946771860122681,True,1.0,0.08492350578308105,False
+slice_026.wav,Voitures (car_det),True,,False,0.46817976236343384,,,0.10813593864440918,False
+slice_1781.wav,Voitures (car_det),True,,True,0.9976223111152649,True,0.999994695186615,0.09516072273254395,False
+slice_429.wav,Voitures (car_det),True,,False,0.049839701503515244,,,0.0599827766418457,False
+slice_1577.wav,Voitures (car_det),True,,True,0.9975758194923401,True,0.9999999403953552,0.11137890815734863,False
+slice_1861.wav,Voitures (car_det),True,,True,0.9962587356567383,True,1.0,0.1010291576385498,False
+slice_1702.wav,Voitures (car_det),True,,True,0.9962659478187561,True,1.0,0.09643435478210449,False
+slice_1669.wav,Voitures (car_det),True,,True,0.9960505962371826,True,1.0,0.09781217575073242,False
+slice_1651.wav,Voitures (car_det),True,,True,0.9960674047470093,True,0.9999998211860657,0.10474491119384766,False
+slice_1689.wav,Voitures (car_det),True,,True,0.992831289768219,True,0.9999983906745911,0.10765528678894043,False
+slice_1516.wav,Voitures (car_det),True,,True,0.9982621073722839,True,1.0,0.1037452220916748,False
+slice_122.wav,Voitures (car_det),True,,True,0.9887540340423584,False,3.956490135514912e-10,0.22876739501953125,False
+slice_1828.wav,Voitures (car_det),True,,True,0.9955042004585266,True,1.0,0.09285974502563477,False
+slice_1890.wav,Voitures (car_det),True,,True,0.9966620802879333,True,1.0,0.10518050193786621,False
+slice_1460.wav,Voitures (car_det),True,,True,0.9919629693031311,True,1.0,0.0930640697479248,False
+slice_1682.wav,Voitures (car_det),True,,True,0.9981261491775513,True,0.9999986886978149,0.10446429252624512,False
+slice_1703.wav,Voitures (car_det),True,,True,0.9987260699272156,True,1.0,0.08966708183288574,False
+slice_055.wav,Voitures (car_det),True,,True,0.9464272856712341,False,7.427342740840004e-09,0.21561479568481445,False
+slice_198.wav,Voitures (car_det),True,,True,0.99555903673172,False,7.039167394395918e-05,0.21372318267822266,False

@@ -1,0 +1,58 @@
+name: Deploy Frontend to S3
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:  # Permet le déclenchement manuel
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: Quantnuis-Frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: Quantnuis-Frontend
+        run: npm ci
+
+      - name: Build Angular app
+        working-directory: Quantnuis-Frontend
+        run: npm run build -- --configuration=production
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Deploy to S3
+        working-directory: Quantnuis-Frontend
+        run: |
+          aws s3 sync dist/quantnuis_dashboard/browser s3://projet-quantnuis-frontend \
+            --delete \
+            --cache-control "max-age=31536000" \
+            --exclude "index.html"
+
+          # index.html sans cache pour toujours avoir la dernière version
+          aws s3 cp dist/quantnuis_dashboard/browser/index.html s3://projet-quantnuis-frontend/index.html \
+            --cache-control "no-cache, no-store, must-revalidate"
+
+      # Décommentez si vous utilisez CloudFront
+      # - name: Invalidate CloudFront cache
+      #   run: |
+      #     aws cloudfront create-invalidation \
+      #       --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+      #       --paths "/*"

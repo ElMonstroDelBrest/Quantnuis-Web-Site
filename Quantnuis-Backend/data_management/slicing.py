@@ -64,6 +64,38 @@ def get_next_slice_num(slices_dir: Path) -> int:
     return max(nums) + 1
 
 
+def get_label_value(raw_label, model_name):
+    """
+    Map raw label (string/int) to model specific integer label.
+    Returns:
+        int: The mapped label
+        None: If the label should be skipped
+    """
+    s_label = str(raw_label).lower().strip()
+    
+    # Direct integer support
+    if s_label in ['0', '1']:
+        return int(s_label)
+        
+    if model_name == "car_detector":
+        # 1 = Car, 0 = No Car
+        if s_label in ['car', 'noisy_car']:
+            return 1
+        elif s_label in ['noise', 'other']:
+            return 0
+            
+    elif model_name == "noisy_car_detector":
+        # 1 = Noisy, 0 = Normal
+        if s_label == 'noisy_car':
+            return 1
+        elif s_label == 'car': # Normal car
+            return 0
+        # Skip noise/other for noisy car detector as it only processes cars
+        return None
+        
+    return None
+
+
 def slice_audio(
     audio_path: str, 
     annotations_path: str, 
@@ -125,8 +157,15 @@ def slice_audio(
         try:
             start_s = time_to_seconds(row['Start'])
             end_s = time_to_seconds(row['End'])
+            
+            # Map Label
+            label = get_label_value(row['Label'], model_name)
+            if label is None:
+                print_warning(f"Label ignoré/inconnu pour {model_name}: {row['Label']} (ligne {idx})")
+                continue
+
         except Exception as e:
-            print_warning(f"Format de temps invalide ligne {idx}: {e}")
+            print_warning(f"Format de temps ou données invalide ligne {idx}: {e}")
             continue
         
         nfile = f"slice_{next_num:03d}.wav"
@@ -144,11 +183,11 @@ def slice_audio(
             new_rows.append({
                 'nfile': nfile,
                 'length': end_s - start_s,
-                'label': row['Label'],
+                'label': label,
                 'reliability': row.get('Reliability', 3)
             })
             
-            print_info(f"  ✓ {nfile} ({row['Start']} → {row['End']}, label={row['Label']})")
+            print_info(f"  ✓ {nfile} ({row['Start']} → {row['End']}, label={label})")
             next_num += 1
             
         except Exception as e:

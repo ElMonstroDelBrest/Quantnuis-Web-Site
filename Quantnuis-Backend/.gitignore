@@ -37,19 +37,30 @@ env/
 *.swo
 *~
 
-# --- Données ---
+# --- Donnees d'entrainement ---
 data/car_detector/slices/
 data/car_detector/features.csv
 data/noisy_car_detector/slices/
 data/noisy_car_detector/features.csv
+data/*/features_all.csv
+data/*/features_optimized.csv
 *.db
 
-# --- Artifacts des modèles ---
-# Les modèles entraînés (trop lourds pour git)
+# --- Artifacts des modeles (trop lourds pour git) ---
 models/car_detector/artifacts/*.h5
 models/car_detector/artifacts/*.pkl
 models/noisy_car_detector/artifacts/*.h5
 models/noisy_car_detector/artifacts/*.pkl
+models/noisy_car_detector/artifacts/cnn_*.h5
+models/noisy_car_detector/artifacts/cnn_*.json
+
+# --- Outputs temporaires / resultats ---
+benchmark_results/
+scripts/outputs/
+data/*/optimization_results.csv
+data/*/training_history*.png
+data/*/optimized_features.txt
+*.backup
 
 # --- Logs et cache ---
 *.log
@@ -71,3 +82,11 @@ tmp/
 
 # --- Jupyter ---
 .ipynb_checkpoints/
+
+# --- LaTeX (artefacts de compilation) ---
+*.aux
+*.toc
+*.out
+*.fls
+*.fdb_latexmk
+*.synctex.gz

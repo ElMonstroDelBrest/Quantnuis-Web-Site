@@ -78,6 +78,8 @@ class Settings:
     @property
     def CAR_DETECTOR_DIR(self) -> Path:
         """Dossier des artifacts du modèle détection voiture"""
+        if self.IS_LAMBDA:
+            return Path("/tmp/models/car_detector/artifacts")
         return self.BASE_DIR / "models" / "car_detector" / "artifacts"
     
     @property
@@ -105,6 +107,8 @@ class Settings:
     @property
     def NOISY_CAR_DETECTOR_DIR(self) -> Path:
         """Dossier des artifacts du modèle voiture bruyante"""
+        if self.IS_LAMBDA:
+            return Path("/tmp/models/noisy_car_detector/artifacts")
         return self.BASE_DIR / "models" / "noisy_car_detector" / "artifacts"
     
     @property
@@ -138,7 +142,7 @@ class Settings:
             return Path(env_path)
         if self.IS_LAMBDA:
             return Path("/tmp/quantnuis.db")
-        return self.BASE_DIR / "quantnuis.db"
+        return self.DATA_DIR / "quantnuis.db"
     
     @property
     def DATABASE_URL(self) -> str:
@@ -148,27 +152,64 @@ class Settings:
     # ==========================================================================
     # CONFIGURATION S3
     # ==========================================================================
-    
+
     S3_BUCKET_NAME: str = os.environ.get("DB_BUCKET_NAME", "quantnuis-db-bucket")
     """Nom du bucket S3 pour la persistance de la BDD"""
+
+    S3_MODELS_BUCKET: str = os.environ.get("MODELS_BUCKET_NAME", "quantnuis-db-bucket")
+    """Nom du bucket S3 pour les artifacts modeles (meme bucket que la DB par defaut)"""
+
+    S3_AUDIO_BUCKET_NAME: str = os.environ.get("AUDIO_BUCKET_NAME", "quantnuis-audio-bucket")
+    """Nom du bucket S3 pour les fichiers audio d'annotation"""
+
+    S3_PRESIGNED_URL_EXPIRATION: int = int(os.environ.get("S3_PRESIGNED_URL_EXPIRATION", "3600"))
+    """Duree de validite des URLs presignees en secondes (defaut: 1h)"""
+
+    LAMBDA_PREDICT_URL: str = os.environ.get(
+        "LAMBDA_PREDICT_URL",
+        "https://fpzs67o2m7jc4bhljfi64xoxby0ygfwe.lambda-url.eu-west-3.on.aws"
+    )
+    """URL de la Lambda de prédiction IA"""
     
     # ==========================================================================
     # CONFIGURATION API / SÉCURITÉ
     # ==========================================================================
     
-    SECRET_KEY: str = os.environ.get(
-        "SECRET_KEY", 
-        "dev_secret_key_a_changer_en_production_absolument"
-    )
-    """Clé secrète pour JWT (CHANGER EN PRODUCTION !)"""
+    @property
+    def SECRET_KEY(self) -> str:
+        """
+        Clé secrète pour JWT.
+        Si non définie en variable d'environnement, génère une clé aléatoire
+        et émet un avertissement (les tokens seront invalidés au redémarrage).
+        """
+        key = os.environ.get("SECRET_KEY")
+        if not key:
+            # Si une clé a déjà été générée pour cette instance, on la retourne
+            if hasattr(self, "_generated_key"):
+                return self._generated_key
+            
+            import secrets
+            import warnings
+            
+            # Générer une clé forte
+            self._generated_key = secrets.token_urlsafe(32)
+            
+            warnings.warn(
+                "⚠️ SÉCURITÉ : Aucune SECRET_KEY définie. "
+                "Une clé temporaire a été générée. "
+                "Les sessions seront invalidées au redémarrage du serveur.",
+                RuntimeWarning
+            )
+            return self._generated_key
+        return key
     
     ALGORITHM: str = "HS256"
     """Algorithme de signature JWT"""
     
     ACCESS_TOKEN_EXPIRE_MINUTES: int = int(
-        os.environ.get("ACCESS_TOKEN_EXPIRE_MINUTES", "30")
+        os.environ.get("ACCESS_TOKEN_EXPIRE_MINUTES", "1440")  # 24 heures par défaut
     )
-    """Durée de validité du token (minutes)"""
+    """Durée de validité du token (minutes) - 24h par défaut"""
     
     # ==========================================================================
     # CONFIGURATION ENTRAÎNEMENT

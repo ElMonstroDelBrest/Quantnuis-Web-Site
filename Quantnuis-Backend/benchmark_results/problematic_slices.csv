@@ -1,0 +1,20 @@
+nfile,type,true_label,predicted,confidence
+slice_387.wav,misclassified,Pas vehicule,Vehicule,0.9817528076652782
+slice_362.wav,misclassified,Pas vehicule,Vehicule,0.9727331867559896
+slice_272.wav,misclassified,Pas vehicule,Vehicule,0.9720939128165256
+slice_363.wav,misclassified,Pas vehicule,Vehicule,0.9655099039955155
+slice_273.wav,misclassified,Pas vehicule,Vehicule,0.9523155705279474
+slice_253.wav,misclassified,Vehicule,Pas vehicule,0.9374749124901921
+slice_255.wav,misclassified,Vehicule,Pas vehicule,0.9089123103325337
+slice_275.wav,misclassified,Pas vehicule,Vehicule,0.8443152286414375
+slice_254.wav,misclassified,Vehicule,Pas vehicule,0.7817296663585723
+slice_256.wav,misclassified,Vehicule,Pas vehicule,0.7491023071076653
+slice_094.wav,misclassified,Vehicule,Pas vehicule,0.7116494623178163
+slice_257.wav,misclassified,Vehicule,Pas vehicule,0.6766768858348664
+slice_024.wav,misclassified,Vehicule,Pas vehicule,0.5243169239726448
+slice_005.wav,misclassified,Vehicule,Pas vehicule,0.5168539849045737
+slice_011.wav,misclassified,Vehicule,Pas vehicule,0.5127629145671931
+slice_252.wav,outlier,Vehicule,,1.5558853423796493
+slice_029.wav,outlier,Vehicule,,1.5222622185104386
+slice_051.wav,outlier,Vehicule,,1.407013817479662
+slice_206.wav,outlier,Vehicule,,1.382779646750015

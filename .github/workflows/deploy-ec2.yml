@@ -1,0 +1,90 @@
+name: Deploy API to EC2
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'Quantnuis-Backend/api/ec2_api/**'
+      - 'Quantnuis-Backend/database/**'
+      - 'Quantnuis-Backend/config/**'
+      - 'Quantnuis-Backend/deployment/ec2/**'
+      - 'Quantnuis-Backend/requirements-ec2.txt'
+  workflow_dispatch:  # Manual trigger
+
+env:
+  EC2_USER: ubuntu
+  APP_DIR: /opt/quantnuis
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/ec2_key
+          chmod 600 ~/.ssh/ec2_key
+          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to EC2
+        run: |
+          # Copy updated files to EC2
+          rsync -avz --delete \
+            -e "ssh -i ~/.ssh/ec2_key" \
+            --exclude '.git' \
+            --exclude '__pycache__' \
+            --exclude '*.pyc' \
+            --exclude '.env' \
+            --exclude 'data/' \
+            --exclude 'venv/' \
+            --exclude 'models/*/artifacts/' \
+            Quantnuis-Backend/ \
+            ${{ env.EC2_USER }}@${{ secrets.EC2_HOST }}:${{ env.APP_DIR }}/
+
+      - name: Update Nginx config and restart services
+        run: |
+          ssh -i ~/.ssh/ec2_key ${{ env.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            cd /opt/quantnuis
+
+            # Update Nginx configuration if changed
+            if [ -f deployment/ec2/nginx.conf ]; then
+              sudo cp deployment/ec2/nginx.conf /etc/nginx/sites-available/quantnuis
+              sudo nginx -t && sudo systemctl reload nginx
+              echo "✅ Nginx configuration updated"
+            fi
+
+            # Activate virtual environment and install dependencies
+            source venv/bin/activate
+            pip install -q -r requirements-ec2.txt
+
+            # Restart service (requires sudo, configured in sudoers)
+            sudo systemctl restart quantnuis-api
+
+            # Wait and check status
+            sleep 3
+            if systemctl is-active --quiet quantnuis-api; then
+              echo "✅ Service restarted successfully"
+            else
+              echo "❌ Service failed to start"
+              sudo journalctl -u quantnuis-api --no-pager -n 20
+              exit 1
+            fi
+          EOF
+
+      - name: Health check
+        run: |
+          sleep 5
+          HEALTH=$(curl -sf https://${{ secrets.EC2_HOST }}/health || echo "failed")
+          if echo "$HEALTH" | grep -q '"status":"ok"'; then
+            echo "✅ Health check passed"
+            echo "$HEALTH" | jq .
+          else
+            echo "❌ Health check failed"
+            echo "$HEALTH"
+            exit 1
+          fi

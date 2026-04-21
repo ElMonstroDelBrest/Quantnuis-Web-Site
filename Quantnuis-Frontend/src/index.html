@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Quantnuis - Analyseur de Nuisance Sonore IA</title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Application IA pour la détection et l'analyse acoustique des véhicules bruyants. Analysez le niveau sonore en temps réel.">
+  <meta name="keywords" content="nuisance sonore, analyse audio, IA, machine learning, véhicule bruyant, décibels">
+  <meta name="author" content="Quantnuis Team">
+
+  <!-- Security Headers (meta) — frame-ancestors et X-Frame-Options doivent etre des HTTP headers -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://*.lambda-url.eu-west-3.on.aws https://*.amazonaws.com http://*.compute.amazonaws.com; media-src 'self' blob:;">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="microphone=(self), camera=()">
+
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#6366f1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Quantnuis">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="Quantnuis">
+  <meta name="msapplication-TileColor" content="#6366f1">
+  <meta name="msapplication-config" content="none">
+
+  <!-- Manifest -->
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Favicon & Icons -->
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512x512.png">
+  <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-192x192.png">
+  <link rel="apple-touch-icon" sizes="167x167" href="icons/icon-192x192.png">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <app-root></app-root>
+
+  <!-- Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+      });
+    }
+  </script>
+
+  <!-- PWA Install Prompt Handler -->
+  <script>
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      window.deferredPrompt = deferredPrompt;
+    });
+    window.addEventListener('appinstalled', () => { deferredPrompt = null; });
+  </script>
+</body>
+</html>

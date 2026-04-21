@@ -1,32 +1,14 @@
 #!/usr/bin/env python3
 """
-================================================================================
-                    ENTRAÎNEMENT - VOITURE BRUYANTE
-================================================================================
-
-Entraîne le modèle de classification pour détecter si une voiture est bruyante.
-
-Ce modèle ne traite QUE les audio où une voiture a déjà été détectée.
-
-Pipeline identique au car_detector :
-    1. Chargement des features depuis le CSV
-    2. Sélection des meilleures features
-    3. Data Augmentation avec SMOTE
-    4. Split Train/Test (80%/20%)
-    5. Standardisation des données
-    6. Création du modèle
-    7. Entraînement
-    8. Évaluation et visualisation
-    9. Sauvegarde
+Entraînement du modèle NoisyCarDetector.
 
 Usage:
-    python -m models.noisy_car_detector.train
-
-================================================================================
+    python -m models.noisy_car_detector.train              # Entraîner
+    python -m models.noisy_car_detector.train --features 15  # Custom features
+    python -m models.noisy_car_detector.train --no-plot    # Sans graphiques
 """
 
-import os
-import sys
+import argparse
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -35,368 +17,232 @@ import joblib
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import f1_score, classification_report, confusion_matrix
 from imblearn.over_sampling import SMOTE
 
 import tensorflow as tf
 from tensorflow.keras import layers, models, regularizers
 
 from config import get_settings
-from shared import (
-    print_header, print_success, print_info, 
-    print_warning, print_error, Colors
-)
+from shared import print_header, print_success, print_info, print_warning, print_error, Colors
 from . import config
 
 settings = get_settings()
 
 
 def setup_gpu():
-    """Configure TensorFlow pour utiliser le GPU si disponible."""
+    """Configure TensorFlow GPU."""
     gpus = tf.config.list_physical_devices('GPU')
-    
     if gpus:
         try:
             for gpu in gpus:
                 tf.config.experimental.set_memory_growth(gpu, True)
-            return f"GPU CUDA ({len(gpus)} device(s))", [g.name for g in gpus]
-        except RuntimeError as e:
-            return f"GPU (erreur: {e})", []
-    
-    return "CPU (pas de GPU détecté)", []
+            return f"GPU ({len(gpus)})", True
+        except RuntimeError:
+            pass
+    return "CPU", False
 
 
-def analyze_feature_importance(X: np.ndarray, y: np.ndarray, 
-                               feature_names: list, n_top: int = 12) -> list:
-    """
-    Analyse l'importance des features avec Random Forest.
-    
-    Paramètres:
-        X: Matrice des features
-        y: Labels
-        feature_names: Noms des features
-        n_top: Nombre de features à sélectionner
-    
-    Retourne:
-        list: Top N features les plus importantes
-    """
-    print_info("Analyse de l'importance des features...")
-    
+def select_features(X: np.ndarray, y: np.ndarray, names: list, n: int) -> tuple:
+    """Sélectionne les N meilleures features via Random Forest."""
     rf = RandomForestClassifier(n_estimators=100, random_state=42, n_jobs=-1)
     rf.fit(X, y)
-    
-    # Trier par importance
-    importance = pd.DataFrame({
-        'Feature': feature_names,
-        'Importance': rf.feature_importances_
-    }).sort_values('Importance', ascending=False)
-    
-    # Sauvegarder l'analyse
-    importance_path = config.DATA_DIR / "feature_importance.csv"
-    importance.to_csv(importance_path, index=False)
-    print_success(f"Importance sauvegardée: {importance_path}")
-    
-    top_features = importance['Feature'].head(n_top).tolist()
-    
-    print_info(f"Top {n_top} features:")
-    for i, feat in enumerate(top_features, 1):
-        score = importance[importance['Feature'] == feat]['Importance'].values[0]
-        print(f"    {i:>2}. {feat}: {score:.4f}")
-    
-    return top_features
+
+    importance = pd.DataFrame({'name': names, 'score': rf.feature_importances_})
+    importance = importance.sort_values('score', ascending=False)
+
+    # Sauvegarder
+    importance.to_csv(config.DATA_DIR / "feature_importance.csv", index=False)
+
+    top = importance.head(n)['name'].tolist()
+    print_info(f"Top {n} features sélectionnées")
+
+    return top, [names.index(f) for f in top]
 
 
 def create_model(n_features: int) -> tf.keras.Model:
-    """
-    Crée le modèle de réseau de neurones.
-    
-    Architecture :
-        Input (n_features) → Dense 64 → Dropout → Dense 32 → Dropout → Output 1
-    
-    Paramètres:
-        n_features: Nombre de features en entrée
-    
-    Retourne:
-        tf.keras.Model: Modèle compilé
-    """
+    """Crée le modèle MLP."""
     model = models.Sequential([
         layers.Input(shape=(n_features,)),
-        
-        # Première couche cachée
-        layers.Dense(64, activation='relu', 
-                     kernel_regularizer=regularizers.l2(0.001)),
+        layers.Dense(64, activation='relu', kernel_regularizer=regularizers.l2(0.001)),
         layers.Dropout(0.3),
-        
-        # Deuxième couche cachée
-        layers.Dense(32, activation='relu',
-                     kernel_regularizer=regularizers.l2(0.001)),
+        layers.Dense(32, activation='relu', kernel_regularizer=regularizers.l2(0.001)),
         layers.Dropout(0.2),
-        
-        # Couche de sortie
         layers.Dense(1, activation='sigmoid')
     ])
-    
+
     model.compile(
         optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
         loss='binary_crossentropy',
         metrics=['accuracy']
     )
-    
     return model
 
 
-def train_noisy_car_detector():
-    """
-    Fonction principale d'entraînement du modèle de voiture bruyante.
-    """
-    
-    # ==========================================================================
-    # CONFIGURATION GPU
-    # ==========================================================================
-    
-    print_header("Configuration Hardware")
-    device_type, gpu_info = setup_gpu()
-    
-    print_info(f"TensorFlow version: {tf.__version__}")
-    if "GPU" in device_type:
-        print_success(f"Device: {device_type}")
-    else:
-        print_warning(f"Device: {device_type}")
-    
-    # ==========================================================================
-    # CHARGEMENT DES DONNÉES
-    # ==========================================================================
-    
-    print_header("Chargement des Données")
-    
+def train(n_features: int = None, show_plot: bool = True):
+    """Entraîne le modèle."""
+
+    # Config
+    device, has_gpu = setup_gpu()
+    print_header(f"NoisyCarDetector Training [{device}]")
+
     if not config.FEATURES_CSV.exists():
-        print_error(f"Fichier non trouvé: {config.FEATURES_CSV}")
-        print_info("Lancez d'abord: python -m models.noisy_car_detector.feature_extraction")
-        return
-    
+        print_error("Features non extraites. Lancez d'abord:")
+        print_info("  python -m models.noisy_car_detector.feature_extraction")
+        return 1
+
+    # Charger données
     df = pd.read_csv(config.FEATURES_CSV)
-    print_info(f"{len(df)} échantillons chargés")
-    print_info("(Uniquement des audios avec voiture détectée)")
-    
-    # ==========================================================================
-    # PRÉPARATION DES FEATURES
-    # ==========================================================================
-    
-    print_header("Préparation des Features")
-    
-    # Colonnes de features (exclure métadonnées)
+    print_info(f"Données: {len(df)} échantillons")
+
     meta_cols = ['nfile', 'label', 'reliability']
     feature_cols = [c for c in df.columns if c not in meta_cols]
-    
+
     X = df[feature_cols].values
     y = df['label'].values
-    
-    # Afficher distribution
-    unique_labels = np.unique(y)
-    print_info(f"Labels uniques: {unique_labels}")
-    
-    for label in unique_labels:
-        count = np.sum(y == label)
-        label_name = config.NEGATIVE_LABEL if label == 0 else config.POSITIVE_LABEL
-        print_info(f"  Label {label} ({label_name}): {count}")
-    
-    # ==========================================================================
-    # SÉLECTION DES MEILLEURES FEATURES
-    # ==========================================================================
-    
-    print_header("Sélection des Features")
-    
-    n_top = settings.TOP_FEATURES_COUNT
-    top_features = analyze_feature_importance(X, y, feature_cols, n_top)
-    
-    # Filtrer les features
-    feature_indices = [feature_cols.index(f) for f in top_features]
-    X = X[:, feature_indices]
-    
-    print_success(f"{len(top_features)} features sélectionnées")
-    
-    # ==========================================================================
-    # DATA AUGMENTATION (SMOTE)
-    # ==========================================================================
-    
-    print_header("Data Augmentation (SMOTE)")
-    
-    print_info(f"Taille avant: {X.shape[0]} échantillons")
-    
+
+    # Distribution
+    for lbl in [0, 1]:
+        name = config.NEGATIVE_LABEL if lbl == 0 else config.POSITIVE_LABEL
+        print_info(f"  {name}: {(y == lbl).sum()}")
+
+    # Split 3-voies : train / val (EarlyStopping) / test (évaluation finale uniquement)
+    # Le test set est hermétiquement isolé — EarlyStopping ne le voit jamais.
+    X_trainval, X_test, y_trainval, y_test = train_test_split(
+        X, y, test_size=settings.TEST_SIZE, random_state=42, stratify=y
+    )
+    X_train, X_val, y_train, y_val = train_test_split(
+        X_trainval, y_trainval, test_size=0.2, random_state=42, stratify=y_trainval
+    )
+    print_info(f"Split: Train={len(X_train)} | Val={len(X_val)} | Test={len(X_test)}")
+
+    # Sélection features sur le train set uniquement (pas de leakage)
+    n_top = n_features or settings.TOP_FEATURES_COUNT
+    top_features, indices = select_features(X_train, y_train, feature_cols, n_top)
+    X_train = X_train[:, indices]
+    X_val   = X_val[:, indices]
+    X_test  = X_test[:, indices]
+
+    # SMOTE uniquement sur le training set
+    minority = min((y_train == 0).sum(), (y_train == 1).sum())
+    k = min(settings.SMOTE_K_NEIGHBORS, minority - 1)
+    k = max(1, k)
+
+    smote_ok = False
     try:
-        smote = SMOTE(k_neighbors=settings.SMOTE_K_NEIGHBORS, random_state=42)
-        X_resampled, y_resampled = smote.fit_resample(X, y)
-        
-        print_success(f"Taille après: {X_resampled.shape[0]} échantillons")
-        print_info(f"+{X_resampled.shape[0] - X.shape[0]} données synthétiques")
-        
-        unique, counts = np.unique(y_resampled, return_counts=True)
-        for label, count in zip(unique, counts):
-            label_name = config.NEGATIVE_LABEL if label == 0 else config.POSITIVE_LABEL
-            print_info(f"Classe {label} ({label_name}): {count}")
+        smote = SMOTE(k_neighbors=k, random_state=42)
+        X_train, y_train = smote.fit_resample(X_train, y_train)
+        print_info(f"SMOTE: {len(X_train)} échantillons (train)")
+        smote_ok = True
     except Exception as e:
         print_warning(f"SMOTE échoué: {e}")
-        X_resampled, y_resampled = X, y
-    
-    # ==========================================================================
-    # SPLIT TRAIN/TEST
-    # ==========================================================================
-    
-    print_header("Split Train/Test")
-    
-    X_train, X_test, y_train, y_test = train_test_split(
-        X_resampled, y_resampled,
-        test_size=settings.TEST_SIZE,
-        random_state=42,
-        stratify=y_resampled
-    )
-    
-    print_info(f"Train: {X_train.shape[0]} échantillons")
-    print_info(f"Test:  {X_test.shape[0]} échantillons")
-    
-    # ==========================================================================
-    # STANDARDISATION
-    # ==========================================================================
-    
-    print_header("Standardisation")
-    
+
+    # Standardisation — fit sur train uniquement
     scaler = StandardScaler()
     X_train = scaler.fit_transform(X_train)
-    X_test = scaler.transform(X_test)
-    
-    print_success("Données standardisées (μ=0, σ=1)")
-    
-    # ==========================================================================
-    # CRÉATION DU MODÈLE
-    # ==========================================================================
-    
-    print_header("Création du Modèle")
-    
+    X_val   = scaler.transform(X_val)
+    X_test  = scaler.transform(X_test)
+
+    # Modèle
     model = create_model(X_train.shape[1])
-    model.summary()
-    
-    # ==========================================================================
-    # ENTRAÎNEMENT
-    # ==========================================================================
-    
-    print_header("Entraînement")
-    
-    class ProgressCallback(tf.keras.callbacks.Callback):
+
+    # Class weights — uniquement si SMOTE a échoué (évite la double compensation)
+    if smote_ok:
+        class_weights = None
+    else:
+        unique, counts = np.unique(y_train, return_counts=True)
+        total = len(y_train)
+        class_weights = {int(c): total / (len(unique) * count) for c, count in zip(unique, counts)}
+
+    # Callbacks
+    early_stop = tf.keras.callbacks.EarlyStopping(
+        monitor='val_loss', patience=20, restore_best_weights=True
+    )
+
+    class Progress(tf.keras.callbacks.Callback):
         def on_epoch_end(self, epoch, logs=None):
             if (epoch + 1) % 10 == 0:
-                acc = logs.get('accuracy', 0) * 100
-                val_acc = logs.get('val_accuracy', 0) * 100
-                print(f"    Epoch {epoch+1}/{settings.TRAINING_EPOCHS} - "
-                      f"Acc: {acc:.1f}% - Val Acc: {val_acc:.1f}%")
-    
+                print_info(f"Epoch {epoch+1}: acc={logs['accuracy']:.3f} val_acc={logs.get('val_accuracy', 0):.3f}")
+
+    # Training — EarlyStopping sur le val set (jamais le test set)
+    print_header("Training")
     history = model.fit(
         X_train, y_train,
         epochs=settings.TRAINING_EPOCHS,
         batch_size=settings.TRAINING_BATCH_SIZE,
-        validation_data=(X_test, y_test),
+        validation_data=(X_val, y_val),
+        class_weight=class_weights,
         verbose=0,
-        callbacks=[ProgressCallback()]
+        callbacks=[Progress(), early_stop]
     )
-    
-    # ==========================================================================
-    # ÉVALUATION
-    # ==========================================================================
-    
+
+    # Évaluation
     print_header("Résultats")
-    
-    loss, accuracy = model.evaluate(X_test, y_test, verbose=0)
-    
-    print(f"\n  {Colors.BOLD}Performance finale:{Colors.END}")
-    print(f"    • Précision: {Colors.GREEN}{accuracy*100:.2f}%{Colors.END}")
-    print(f"    • Erreur:    {loss:.4f}")
-    
-    if accuracy >= 0.9:
-        print(f"\n  {Colors.GREEN}✓ Excellent !{Colors.END}")
-    elif accuracy >= 0.75:
-        print(f"\n  {Colors.YELLOW}⚠ Bon, mais améliorable{Colors.END}")
-    else:
-        print(f"\n  {Colors.RED}✗ Besoin de plus de données{Colors.END}")
-    
-    # ==========================================================================
-    # VISUALISATION
-    # ==========================================================================
-    
-    print_header("Visualisation")
-    
-    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
-    
-    axes[0].plot(history.history['accuracy'], label='Train', linewidth=2)
-    axes[0].plot(history.history['val_accuracy'], label='Validation', linewidth=2)
-    axes[0].set_title('Précision - Voiture Bruyante', fontweight='bold')
-    axes[0].set_xlabel('Epoch')
-    axes[0].set_ylabel('Accuracy')
-    axes[0].legend()
-    axes[0].grid(True, alpha=0.3)
-    
-    axes[1].plot(history.history['loss'], label='Train', linewidth=2)
-    axes[1].plot(history.history['val_loss'], label='Validation', linewidth=2)
-    axes[1].set_title('Erreur (Loss)', fontweight='bold')
-    axes[1].set_xlabel('Epoch')
-    axes[1].set_ylabel('Loss')
-    axes[1].legend()
-    axes[1].grid(True, alpha=0.3)
-    
-    plt.tight_layout()
-    
-    history_path = config.DATA_DIR / "training_history.png"
-    plt.savefig(history_path, dpi=150, bbox_inches='tight')
-    print_success(f"Courbes sauvegardées: {history_path}")
-    plt.show()
-    
-    # ==========================================================================
-    # SAUVEGARDE
-    # ==========================================================================
-    
+    loss, acc = model.evaluate(X_test, y_test, verbose=0)
+    y_pred = (model.predict(X_test, verbose=0) > 0.5).astype(int).flatten()
+    f1 = f1_score(y_test, y_pred)
+
+    print(f"\n  Accuracy: {acc*100:.2f}%")
+    print(f"  F1 Score: {Colors.GREEN}{f1:.4f}{Colors.END}")
+    print(f"  Loss:     {loss:.4f}\n")
+
+    print(classification_report(y_test, y_pred,
+          target_names=[config.NEGATIVE_LABEL, config.POSITIVE_LABEL]))
+
+    cm = confusion_matrix(y_test, y_pred)
+    print(f"  Confusion: TN={cm[0,0]} FP={cm[0,1]} FN={cm[1,0]} TP={cm[1,1]}")
+
+    # Visualisation
+    if show_plot:
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
+
+        ax1.plot(history.history['accuracy'], label='Train')
+        ax1.plot(history.history['val_accuracy'], label='Val')
+        ax1.set_title('Accuracy')
+        ax1.legend()
+        ax1.grid(True, alpha=0.3)
+
+        ax2.plot(history.history['loss'], label='Train')
+        ax2.plot(history.history['val_loss'], label='Val')
+        ax2.set_title('Loss')
+        ax2.legend()
+        ax2.grid(True, alpha=0.3)
+
+        plt.tight_layout()
+        plt.savefig(config.DATA_DIR / "training_history.png", dpi=150)
+        plt.show()
+
+    # Sauvegarde
     print_header("Sauvegarde")
-    
-    # Créer le dossier artifacts
     config.ARTIFACTS_DIR.mkdir(parents=True, exist_ok=True)
-    
-    # Sauvegarder le modèle
+
     model.save(str(config.MODEL_PATH))
-    print_success(f"Modèle: {config.MODEL_PATH}")
-    
-    # Sauvegarder le scaler
     joblib.dump(scaler, str(config.SCALER_PATH))
-    print_success(f"Scaler: {config.SCALER_PATH}")
-    
-    # Sauvegarder la liste des features
     with open(config.FEATURES_PATH, 'w') as f:
         f.write('\n'.join(top_features))
+
+    print_success(f"Modèle:   {config.MODEL_PATH}")
+    print_success(f"Scaler:   {config.SCALER_PATH}")
     print_success(f"Features: {config.FEATURES_PATH}")
-    
-    # ==========================================================================
-    # RÉSUMÉ
-    # ==========================================================================
-    
-    print_header("Résumé")
-    
-    print(f"""
-  {Colors.BOLD}Entraînement terminé - Voiture Bruyante{Colors.END}
-  
-  • Données originales:    {X.shape[0]} échantillons
-  • Après SMOTE:           {X_resampled.shape[0]} échantillons
-  • Features utilisées:    {len(top_features)}
-  • Précision finale:      {Colors.GREEN}{accuracy*100:.2f}%{Colors.END}
-  
-  {Colors.BOLD}Fichiers générés:{Colors.END}
-  • {config.MODEL_PATH}
-  • {config.SCALER_PATH}
-  • {config.FEATURES_PATH}
-  
-  {Colors.GREEN}✓{Colors.END} Prêt pour la production !
-    """)
+
+    print(f"\n{Colors.GREEN}✓{Colors.END} Entraînement terminé (F1={f1:.4f})")
+    return 0
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Entraînement NoisyCarDetector")
+    parser.add_argument('--features', '-n', type=int, default=None,
+                        help=f"Nombre de features (défaut: {settings.TOP_FEATURES_COUNT})")
+    parser.add_argument('--no-plot', action='store_true',
+                        help="Désactiver les graphiques")
+
+    args = parser.parse_args()
+    return train(n_features=args.features, show_plot=not args.no_plot)
 
 
 if __name__ == "__main__":
     try:
-        train_noisy_car_detector()
+        exit(main())
     except KeyboardInterrupt:
-        print(f"\n{Colors.YELLOW}[!]{Colors.END} Annulé")
-    except Exception as e:
-        print_error(str(e))
-        raise
+        print("\nAnnulé")
+        exit(130)

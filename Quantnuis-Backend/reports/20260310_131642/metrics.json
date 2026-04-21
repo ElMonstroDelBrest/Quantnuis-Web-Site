@@ -1,0 +1,56 @@
+{
+  "generated_at": "2026-03-10T13:17:09.069310",
+  "n_total": 200,
+  "n_errors": 0,
+  "car_detector": {
+    "n": 200,
+    "accuracy": 0.98,
+    "precision": 1.0,
+    "recall": 0.9733333333333334,
+    "f1": 0.9864864864864865,
+    "roc_auc": 0.998
+  },
+  "noisy_car_detector": {
+    "n": 99,
+    "accuracy": 0.9797979797979798,
+    "precision": 0.9615384615384616,
+    "recall": 1.0,
+    "f1": 0.9803921568627451,
+    "roc_auc": 1.0
+  },
+  "latency": {
+    "mean": 0.1232073450088501,
+    "median": 0.09605836868286133,
+    "p95": 0.22520132064819334,
+    "p99": 0.23891867160796926,
+    "min": 0.03966522216796875,
+    "max": 0.7547838687896729
+  },
+  "by_case": {
+    "Voitures bruyantes": {
+      "n": 50,
+      "car_accuracy": 1.0,
+      "noisy_accuracy": 1.0,
+      "avg_latency": 0.10274143695831299
+    },
+    "Voitures normales": {
+      "n": 50,
+      "car_accuracy": 0.98,
+      "noisy_accuracy": 0.9591836734693877,
+      "avg_latency": 0.2237846279144287
+    },
+    "Bruit / pas voiture": {
+      "n": 50,
+      "car_accuracy": 1.0,
+      "noisy_accuracy": null,
+      "avg_latency": 0.04595951557159424
+    },
+    "Voitures (car_det)": {
+      "n": 50,
+      "car_accuracy": 0.94,
+      "noisy_accuracy": null,
+      "avg_latency": 0.12034379959106445
+    }
+  },
+  "verdict": "EXCELLENTE — Prête pour production"
+}

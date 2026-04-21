@@ -1,0 +1,40 @@
+{
+  "_comment": "Liste des audios proposés aux visiteurs du salon. Chaque entrée pointe vers un fichier dans /demo-audios/. Label = ce que voit le visiteur. Ne pas inclure 'expectedResult' côté visiteur si on veut préserver le suspense.",
+  "audios": [
+    {
+      "id": "demo-1",
+      "file": "voiture-normale.wav",
+      "label": "Voiture normale",
+      "description": "Véhicule urbain respectant les limites sonores",
+      "icon": "car"
+    },
+    {
+      "id": "demo-2",
+      "file": "voiture-sport-bruyante.wav",
+      "label": "Voiture de sport bruyante",
+      "description": "Accélération à fort régime moteur",
+      "icon": "sport"
+    },
+    {
+      "id": "demo-3",
+      "file": "moto-conforme.wav",
+      "label": "Moto conforme",
+      "description": "Deux-roues homologué en circulation",
+      "icon": "moto"
+    },
+    {
+      "id": "demo-4",
+      "file": "moto-bruyante.wav",
+      "label": "Moto bruyante",
+      "description": "Deux-roues avec échappement modifié",
+      "icon": "moto"
+    },
+    {
+      "id": "demo-5",
+      "file": "rue-calme.wav",
+      "label": "Rue sans véhicule",
+      "description": "Bruit ambiant, aucun véhicule détecté",
+      "icon": "street"
+    }
+  ]
+}

@@ -30,13 +30,23 @@ ARTIFACTS_DIR = settings.NOISY_CAR_DETECTOR_DIR
 """Dossier contenant les artifacts du modèle"""
 
 MODEL_PATH = settings.NOISY_CAR_MODEL_PATH
-"""Chemin du modèle .h5"""
+"""Chemin du modèle MLP .h5 (ancien)"""
 
 SCALER_PATH = settings.NOISY_CAR_SCALER_PATH
-"""Chemin du scaler .pkl"""
+"""Chemin du scaler .pkl (ancien MLP)"""
 
 FEATURES_PATH = settings.NOISY_CAR_FEATURES_PATH
-"""Chemin de la liste des features"""
+"""Chemin de la liste des features (ancien MLP)"""
+
+# ==============================================================================
+# CNN SUR MEL-SPECTROGRAMMES (nouveau modèle)
+# ==============================================================================
+
+CNN_MODEL_PATH = ARTIFACTS_DIR / "cnn_noisy_car.h5"
+"""Chemin du modèle CNN .h5"""
+
+CNN_CONFIG_PATH = ARTIFACTS_DIR / "cnn_config.json"
+"""Chemin de la config CNN (normalisation, paramètres spectrogramme)"""
 
 
 # ==============================================================================

@@ -1,229 +1,174 @@
 #!/usr/bin/env python3
 """
-================================================================================
-                    EXTRACTION DE FEATURES - VOITURE BRUYANTE
-================================================================================
-
-Extraction de caractéristiques audio pour la détection de voiture bruyante.
-
-Ce modèle ne traite QUE les fichiers où une voiture a été détectée.
+Extraction de features audio pour la détection de véhicules bruyants.
 
 Usage:
-    python -m models.noisy_car_detector.feature_extraction              # Extraire
-    python -m models.noisy_car_detector.feature_extraction status       # Statut
-    python -m models.noisy_car_detector.feature_extraction --force      # Forcer
-
-================================================================================
+    python -m models.noisy_car_detector.feature_extraction           # Extraction
+    python -m models.noisy_car_detector.feature_extraction --force   # Réextraire tout
+    python -m models.noisy_car_detector.feature_extraction --status  # Statut
+    python -m models.noisy_car_detector.feature_extraction --label 1 # Un seul label
 """
 
+import argparse
 import os
-import sys
 import pandas as pd
-from pathlib import Path
+from concurrent.futures import ProcessPoolExecutor, as_completed
 
 from shared import (
-    print_header, print_success, print_info, 
-    print_warning, print_error, load_audio, 
-    normalize_audio, extract_base_features
+    print_header, print_success, print_info,
+    print_warning, print_error, load_audio,
+    normalize_audio, extract_all_features
 )
 from . import config
 
 
-def extract_noisy_features(file_path: str) -> dict | None:
-    """
-    Extrait les caractéristiques audio pour la détection de voiture bruyante.
-    
-    Peut extraire des features additionnelles spécifiques au bruit
-    (analyse des hautes fréquences, pics de volume, etc.)
-    
-    Paramètres:
-        file_path (str): Chemin vers le fichier audio
-    
-    Retourne:
-        dict: Dictionnaire des features, ou None si erreur
-    """
+def extract_features_from_file(file_path: str) -> dict | None:
+    """Extrait les features d'un fichier audio."""
     try:
-        # Charger et normaliser l'audio
         y, sr = load_audio(file_path)
-        
         if len(y) == 0:
             return None
-        
         y = normalize_audio(y)
-        
-        # Extraire les features de base
-        features = extract_base_features(y, sr)
-        
-        # Features spécifiques au bruit de voiture
-        # On pourrait ajouter ici des analyses plus fines :
-        # - Analyse des basses fréquences (moteur)
-        # - Pics de décibels
-        # - Patterns de bruit d'échappement
-        
-        return features
-        
+        return extract_all_features(y, sr)
     except Exception as e:
-        print_error(f"Erreur sur {file_path}: {e}")
+        print_error(f"Erreur: {file_path}: {e}")
         return None
 
 
-def extract_all(target_label: int = None, force: bool = False):
-    """
-    Extrait les features de tous les slices pour la détection voiture bruyante.
-    
-    Paramètres:
-        target_label: Si spécifié, n'extrait que ce label
-        force: Si True, réextrait même si déjà fait
-    """
-    print_header("Extraction Features - Voiture Bruyante")
-    
-    # Vérifier que les données existent
+def extract(label: int = None, force: bool = False):
+    """Extrait les features de tous les slices."""
+    print_header("Extraction Features - NoisyCarDetector")
+
     if not config.ANNOTATION_CSV.exists():
-        print_error(f"Pas de fichier d'annotations: {config.ANNOTATION_CSV}")
-        print_info("Créez d'abord les données avec slice_manager.py")
-        return
-    
-    # Charger les annotations
+        print_error(f"Fichier manquant: {config.ANNOTATION_CSV}")
+        return 1
+
     df_ann = pd.read_csv(config.ANNOTATION_CSV)
-    
-    # Charger les features existantes
+
+    # Charger existants
     df_existing = None
     existing_files = set()
-    
+
     if config.FEATURES_CSV.exists() and not force:
         df_existing = pd.read_csv(config.FEATURES_CSV)
         existing_files = set(df_existing['nfile'].values)
-        print_info(f"{len(existing_files)} features déjà extraites")
-    
-    # Filtrer par label si demandé
-    if target_label is not None:
-        df_ann = df_ann[df_ann['label'] == target_label]
-        print_info(f"Label {target_label}: {len(df_ann)} fichiers")
-    else:
-        print_info(f"{len(df_ann)} fichiers à traiter")
-    
-    # Filtrer les déjà traités
-    if not force:
-        df_to_process = df_ann[~df_ann['nfile'].isin(existing_files)]
-        print_info(f"{len(df_to_process)} nouveaux fichiers")
-    else:
+        print_info(f"{len(existing_files)} features existantes")
+
+    # Filtrer par label
+    if label is not None:
+        df_ann = df_ann[df_ann['label'] == label]
+        print_info(f"Label {label}: {len(df_ann)} fichiers")
+
+    # Filtrer déjà traités
+    if force:
         df_to_process = df_ann
-        print_info(f"Réextraction forcée de {len(df_to_process)} fichiers")
-    
+        print_info(f"Réextraction: {len(df_to_process)} fichiers")
+    else:
+        df_to_process = df_ann[~df_ann['nfile'].isin(existing_files)]
+        print_info(f"Nouveaux: {len(df_to_process)} fichiers")
+
     if len(df_to_process) == 0:
-        print_success("Tout est déjà extrait")
-        return
-    
-    # Extraction
+        print_success("Tout est extrait")
+        return 0
+
+    # Extraction parallèle
     new_rows = []
-    for i, row in df_to_process.iterrows():
+    total = len(df_to_process)
+    workers = min(os.cpu_count() or 4, total)
+    print_info(f"Extraction parallèle: {workers} workers")
+
+    # Préparer les tâches
+    tasks = []
+    for _, row in df_to_process.iterrows():
         path = config.SLICES_DIR / row['nfile']
-        
         if not path.exists():
-            print_warning(f"{row['nfile']} non trouvé")
+            print_warning(f"Non trouvé: {row['nfile']}")
             continue
-        
-        features = extract_noisy_features(str(path))
-        
-        if features:
-            features['nfile'] = row['nfile']
-            features['label'] = row['label']
-            if 'reliability' in row:
-                features['reliability'] = row['reliability']
-            new_rows.append(features)
-            
-            if len(new_rows) % 20 == 0:
-                print_info(f"{len(new_rows)} fichiers traités...")
-    
+        tasks.append((str(path), row['nfile'], int(row['label']),
+                       float(row.get('reliability', 0.0))))
+
+    done = 0
+    with ProcessPoolExecutor(max_workers=workers) as executor:
+        futures = {
+            executor.submit(extract_features_from_file, t[0]): t
+            for t in tasks
+        }
+        for future in as_completed(futures):
+            path, nfile, lbl, rel = futures[future]
+            features = future.result()
+            done += 1
+            if features:
+                features['nfile'] = nfile
+                features['label'] = lbl
+                features['reliability'] = rel
+                new_rows.append(features)
+            if done % 50 == 0 or done == len(tasks):
+                print_info(f"Progression: {done}/{len(tasks)} ({100*done//len(tasks)}%)")
+
     if not new_rows:
         print_warning("Aucune feature extraite")
-        return
-    
-    # Fusionner avec les existants
+        return 1
+
+    # Fusionner
     df_new = pd.DataFrame(new_rows)
-    
+
     if df_existing is not None and not force:
         df_final = pd.concat([df_existing, df_new], ignore_index=True)
     else:
         df_final = df_new
-    
-    # Supprimer doublons
+
     df_final = df_final.drop_duplicates(subset=['nfile'], keep='last')
-    
-    # Créer le dossier si nécessaire
     config.DATA_DIR.mkdir(parents=True, exist_ok=True)
-    
-    # Sauvegarder
     df_final.to_csv(config.FEATURES_CSV, index=False)
-    
-    print_success(f"{len(new_rows)} fichiers extraits")
-    print_info(f"Total: {len(df_final)} fichiers avec features")
-    print_info(f"Sauvegardé: {config.FEATURES_CSV}")
+
+    print_success(f"Extrait: {len(new_rows)} fichiers")
+    print_info(f"Total: {len(df_final)} | Features: {len(df_final.columns) - 3}")
+    return 0
 
 
-def show_status():
+def status():
     """Affiche le statut des features."""
-    print_header("Statut Features - Voiture Bruyante")
-    
+    print_header("Statut - NoisyCarDetector")
+
     if not config.FEATURES_CSV.exists():
-        print_error("Pas de fichier de features")
-        print_info("Lancez: python -m models.noisy_car_detector.feature_extraction")
-        return
-    
+        print_error("Pas de features extraites")
+        return 1
+
     df = pd.read_csv(config.FEATURES_CSV)
-    
-    print_info(f"{len(df)} fichiers avec features")
-    print_info(f"{len(df.columns) - 3} caractéristiques extraites")
-    
-    # Distribution par label
-    print_header("Distribution")
-    for label in sorted(df['label'].unique()):
-        count = (df['label'] == label).sum()
-        label_name = config.NEGATIVE_LABEL if label == 0 else config.POSITIVE_LABEL
-        print_info(f"Label {label} ({label_name}): {count}")
+
+    print_info(f"Fichiers: {len(df)}")
+    print_info(f"Features: {len(df.columns) - 3}")
+
+    for lbl in sorted(df['label'].unique()):
+        name = config.NEGATIVE_LABEL if lbl == 0 else config.POSITIVE_LABEL
+        print_info(f"  Label {lbl} ({name}): {(df['label'] == lbl).sum()}")
+
+    return 0
 
 
 def main():
-    """Point d'entrée principal."""
-    if len(sys.argv) < 2:
-        print("\n🔊 EXTRACTION FEATURES - VOITURE BRUYANTE")
-        print("=" * 45)
-        print("1. Extraire toutes les features")
-        print("2. Extraire un label spécifique")
-        print("3. Réextraire tout (force)")
-        print("4. Voir le statut")
-        print("0. Quitter")
-        
-        choice = input("\nChoix: ").strip()
-        
-        if choice == "1":
-            extract_all()
-        elif choice == "2":
-            label = input("Label: ").strip()
-            extract_all(target_label=int(label))
-        elif choice == "3":
-            extract_all(force=True)
-        elif choice == "4":
-            show_status()
-    else:
-        cmd = sys.argv[1]
-        
-        if cmd == "status":
-            show_status()
-        elif cmd == "--label":
-            label = int(sys.argv[2]) if len(sys.argv) > 2 else None
-            extract_all(target_label=label)
-        elif cmd == "--force":
-            extract_all(force=True)
-        else:
-            extract_all()
+    parser = argparse.ArgumentParser(
+        description="Extraction de features pour NoisyCarDetector",
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    parser.add_argument('--force', '-f', action='store_true',
+                        help="Réextraire toutes les features")
+    parser.add_argument('--label', '-l', type=int, choices=[0, 1],
+                        help="Extraire uniquement ce label")
+    parser.add_argument('--status', '-s', action='store_true',
+                        help="Afficher le statut")
+
+    args = parser.parse_args()
+
+    if args.status:
+        return status()
+
+    return extract(label=args.label, force=args.force)
 
 
 if __name__ == "__main__":
     try:
-        main()
+        exit(main())
     except KeyboardInterrupt:
-        print("\n⚠ Annulé")
-    except Exception as e:
-        print_error(str(e))
-        raise
+        print("\nAnnulé")
+        exit(130)

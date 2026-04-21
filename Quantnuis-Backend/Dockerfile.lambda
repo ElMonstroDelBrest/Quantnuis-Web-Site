@@ -1,0 +1,41 @@
+# ==============================================================================
+# DOCKERFILE - AWS LAMBDA AI API
+# ==============================================================================
+# Stateless AI API for audio predictions only
+# Uses the simplified lambda_api module
+# ==============================================================================
+
+FROM public.ecr.aws/lambda/python:3.11
+
+# Environment variables for caches
+ENV NUMBA_CACHE_DIR=/tmp
+ENV MPLCONFIGDIR=/tmp
+ENV TRANSFORMERS_CACHE=/tmp
+ENV XDG_CACHE_HOME=/tmp
+
+# Install build tools required for Python packages
+RUN yum install -y gcc gcc-c++ libsndfile && yum clean all
+
+# Copy requirements and install dependencies
+COPY requirements.txt ${LAMBDA_TASK_ROOT}/
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r ${LAMBDA_TASK_ROOT}/requirements.txt
+
+# Copy source code (only what's needed for AI predictions)
+COPY config/ ${LAMBDA_TASK_ROOT}/config/
+COPY shared/ ${LAMBDA_TASK_ROOT}/shared/
+COPY models/ ${LAMBDA_TASK_ROOT}/models/
+COPY pipeline/ ${LAMBDA_TASK_ROOT}/pipeline/
+COPY api/lambda_api/ ${LAMBDA_TASK_ROOT}/api/lambda_api/
+
+# Copy minimal database module (only needed for settings, not for actual DB operations)
+# We create a stub to avoid import errors
+RUN mkdir -p ${LAMBDA_TASK_ROOT}/database
+COPY database/__init__.py ${LAMBDA_TASK_ROOT}/database/
+COPY database/connection.py ${LAMBDA_TASK_ROOT}/database/
+COPY database/models.py ${LAMBDA_TASK_ROOT}/database/
+COPY database/schemas.py ${LAMBDA_TASK_ROOT}/database/
+COPY database/s3_manager.py ${LAMBDA_TASK_ROOT}/database/
+
+# Set the handler to use the new Lambda API module
+CMD ["api.lambda_api.main.handler"]
