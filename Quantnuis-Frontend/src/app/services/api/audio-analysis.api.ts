@@ -7,6 +7,7 @@ export interface AnalysisResult {
   carDetected: boolean;
   confidence: number;
   message: string;
+  error?: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -21,7 +22,8 @@ export class AudioAnalysisApi extends LambdaApi {
         hasNoisyVehicle: false,
         carDetected: false,
         confidence: 0,
-        message: "Erreur de connexion au serveur d'analyse."
+        message: "Erreur de connexion au serveur d'analyse.",
+        error: true
       }))
     );
   }

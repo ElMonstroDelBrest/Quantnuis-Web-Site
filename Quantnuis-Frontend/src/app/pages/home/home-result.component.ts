@@ -5,6 +5,7 @@ export interface AnalysisResultData {
   carDetected: boolean;
   confidence: number;
   message: string;
+  error?: boolean;
 }
 
 @Component({
@@ -13,7 +14,13 @@ export interface AnalysisResultData {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule],
   template: `
-    <div class="result-card" *ngIf="result" [class.noisy]="result.hasNoisyVehicle" [class.safe]="!result.hasNoisyVehicle" role="status" aria-live="polite">
+    <div class="result-card" *ngIf="result && result.error" role="status" aria-live="polite">
+      <div class="verdict-label verdict-label--error">ANALYSE INDISPONIBLE</div>
+      <p class="verdict-message">{{ result.message }}</p>
+      <p class="verdict-hint">Le serveur d'analyse n'a pas répondu. Réessayez dans quelques secondes — la fonction Lambda peut prendre ~30 s au premier appel (cold start).</p>
+    </div>
+
+    <div class="result-card" *ngIf="result && !result.error" [class.noisy]="result.hasNoisyVehicle" [class.safe]="!result.hasNoisyVehicle" role="status" aria-live="polite">
 
       <!-- Verdict icon -->
       <div class="verdict-icon" aria-hidden="true">
@@ -115,6 +122,15 @@ export interface AnalysisResultData {
     }
     .safe .verdict-label { color: var(--success); }
     .noisy .verdict-label { color: var(--danger); }
+    .verdict-label--error { color: var(--danger); }
+
+    .verdict-hint {
+      color: var(--text-tertiary);
+      font-size: 0.82rem;
+      max-width: 420px;
+      margin: 0.5rem auto 0;
+      line-height: 1.55;
+    }
 
     .verdict-message {
       color: var(--text-secondary);

@@ -399,6 +399,12 @@ const CITATION_TEXT = `@misc{quantnuis2026,
         padding-top: 1rem;
       }
       .stat:first-child { border-top: none; padding-top: 0; }
+      .citation-code {
+        font-size: 0.72rem;
+        padding: 1rem;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
     }
   `]
 })
@@ -454,14 +460,21 @@ export class HomeComponent implements AfterViewInit {
     this.audioService.analyzeFile(this.selectedFile).subscribe({
       next: (res) => {
         this.ngZone.run(() => {
-          this.completePipeline(res);
+          if (res.error) {
+            this.pipelineSteps.forEach(s => {
+              if (s.status === 'processing') s.status = 'error';
+            });
+            this.pipelineSteps = [...this.pipelineSteps];
+          } else {
+            this.completePipeline(res);
+            if (!res.hasNoisyVehicle) {
+              this.soundService.playFanfare();
+            } else {
+              this.soundService.playAlert();
+            }
+          }
           this.result = res;
           this.isAnalyzing = false;
-          if (!res.hasNoisyVehicle) {
-            this.soundService.playFanfare();
-          } else {
-            this.soundService.playAlert();
-          }
           this.cdr.detectChanges();
         });
       },

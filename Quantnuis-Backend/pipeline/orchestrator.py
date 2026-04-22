@@ -41,7 +41,7 @@ Usage:
     result = pipeline.analyze("audio.wav")
     
     if result.car_detected and result.is_noisy:
-        print("🚗💨 Voiture bruyante détectée !")
+        print("Véhicule bruyant détecté")
 
 ================================================================================
 """
@@ -276,9 +276,9 @@ class Pipeline:
         # ======================================================================
 
         if is_noisy:
-            message = f"🚗💨 VOITURE BRUYANTE détectée ! (confiance: {noisy_confidence:.1f}%)"
+            message = f"Véhicule bruyant détecté (confiance : {noisy_confidence:.1f}%)"
         else:
-            message = f"🚗 Voiture détectée, niveau sonore NORMAL (confiance: {noisy_confidence:.1f}%)"
+            message = f"Véhicule détecté, niveau sonore conforme (confiance : {noisy_confidence:.1f}%)"
 
         if verbose:
             print_header("Résultat Final")

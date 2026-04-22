@@ -32,8 +32,8 @@ import { ActivatedRoute } from '@angular/router';
           <div class="legal-sub">
             <h2>2. Hébergement</h2>
             <p><strong>Hébergeur :</strong> Amazon Web Services (AWS)</p>
-            <p><strong>Service :</strong> Amazon S3 Static Website Hosting</p>
-            <p><strong>Région :</strong> EU West (Paris)</p>
+            <p><strong>Service :</strong> Amazon CloudFront (origine S3 statique) et AWS Lambda pour l'inférence</p>
+            <p><strong>Région :</strong> eu-west-3 (Paris)</p>
           </div>
 
           <div class="legal-sub">
