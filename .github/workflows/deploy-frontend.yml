@@ -15,6 +15,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
+          lfs: true
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -44,7 +45,8 @@ jobs:
           aws s3 sync dist/quantnuis_dashboard/browser s3://projet-quantnuis-frontend \
             --delete \
             --cache-control "max-age=31536000" \
-            --exclude "index.html"
+            --exclude "index.html" \
+            --exclude "demo-audios/*"
 
           # index.html sans cache pour toujours avoir la dernière version
           aws s3 cp dist/quantnuis_dashboard/browser/index.html s3://projet-quantnuis-frontend/index.html \
