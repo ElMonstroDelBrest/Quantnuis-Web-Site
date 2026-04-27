@@ -39,8 +39,8 @@ import { CommonModule } from '@angular/common';
             Ce projet est développé en 2025–2026 dans le cadre d'un projet de 2e année
             du cycle ingénieur à ENSTA Bretagne par une équipe de quatre étudiants,
             sous la direction du Dr Dorian Cazau. L'objectif est de produire un prototype
-            fonctionnel capable de classifier automatiquement des extraits audio de trois
-            secondes selon deux questions binaires : y a-t-il un véhicule ? est-il bruyant
+            fonctionnel capable de classifier automatiquement des extraits audio de 4 secondes
+            selon deux questions binaires : y a-t-il un véhicule ? est-il bruyant
             au sens réglementaire ?
           </p>
         </div>
@@ -138,7 +138,7 @@ import { CommonModule } from '@angular/common';
               <tr>
                 <td>Frontend</td>
                 <td>Angular 21 · TypeScript</td>
-                <td>Interface SPA standalone, dark / light theme, composants autonomes</td>
+                <td>Interface SPA standalone, dark theme, composants autonomes</td>
               </tr>
               <tr>
                 <td>Infra cloud</td>
@@ -182,7 +182,7 @@ import { CommonModule } from '@angular/common';
               Voir sur GitHub ↗
             </a>
           </div>
-          <p class="licence-note">Licence : à confirmer (TBD).</p>
+          <p class="licence-note">Projet universitaire open source — voir dépôt GitHub.</p>
         </div>
       </section>
 

@@ -40,7 +40,7 @@ import { ActivatedRoute } from '@angular/router';
             <h2>3. Propriété intellectuelle</h2>
             <p>
               Ce projet est développé dans un cadre universitaire. Le code source est disponible
-              sous licence open source (licence à confirmer). Les technologies utilisées (TensorFlow,
+              en open source sur GitHub. Les technologies utilisées (TensorFlow,
               Angular, Python) sont la propriété de leurs détenteurs respectifs.
             </p>
           </div>
