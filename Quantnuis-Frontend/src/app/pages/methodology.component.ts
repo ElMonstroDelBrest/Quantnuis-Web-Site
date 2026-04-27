@@ -89,7 +89,7 @@ import { CommonModule } from '@angular/common';
               <!-- Node 1: Audio brut -->
               <rect class="node-rect" x="30" y="10" width="280" height="64" rx="4"/>
               <text x="170" y="37" text-anchor="middle" class="node-title">AUDIO BRUT</text>
-              <text x="170" y="57" text-anchor="middle" class="node-sub">WAV · 16 kHz · extrait de 3 s</text>
+              <text x="170" y="57" text-anchor="middle" class="node-sub">WAV · 22 050 Hz · extrait de 4 s</text>
 
               <!-- Arrow 1→2 -->
               <line class="arrow" x1="170" y1="74" x2="170" y2="100"/>
@@ -135,9 +135,9 @@ import { CommonModule } from '@angular/common';
             </svg>
             <figcaption>
               Figure 1. Architecture en cascade — CarDetector (CRNN) puis NoisyCarDetector (CNN).
-              Chaque modèle est entraîné indépendamment sur des features mel-spectrogrammes
-              extraites d'extraits audio de 3 s. Si CarDetector ne détecte pas de véhicule,
-              NoisyCarDetector n'est pas sollicité.
+              Chaque modèle opère sur un mel-spectrogramme extrait d'un segment audio de 4 s
+              à 22 050 Hz. Si CarDetector ne détecte pas de véhicule, NoisyCarDetector n'est
+              pas sollicité.
             </figcaption>
           </figure>
         </div>
@@ -151,20 +151,19 @@ import { CommonModule } from '@angular/common';
           <p class="editorial-prose">
             Les modèles sont entraînés sur des enregistrements réels de véhicules en milieu
             urbain, annotés manuellement. Le jeu d'entraînement du NoisyCarDetector contient
-            environ 47 000 échantillons équilibrés par sur-échantillonnage SMOTE (chiffres
-            précis à confirmer). Le dataset du CarDetector couvre environ 28 800 échantillons
-            en validation croisée 5 folds. La durée totale d'audio annoté représente
-            approximativement 12 heures d'enregistrements urbains.
+            47 336 échantillons équilibrés par sur-échantillonnage SMOTE (1 192 échantillons
+            originaux). Le dataset du CarDetector couvre 28 844 échantillons après augmentation.
+            La durée totale d'audio annoté représente approximativement 12 heures
+            d'enregistrements urbains.
           </p>
           <p class="editorial-prose">
             Les features d'entrée sont des mel-spectrogrammes de dimension (128, 173, 1) :
-            128 bandes mel et 173 frames temporelles couvrant 3 à 4 secondes à 22 050 Hz
+            128 bandes mel et 173 frames temporelles couvrant 4 secondes à 22 050 Hz
             avec un hop length de 512 échantillons. Avant entraînement, les spectrogrammes
             sont convertis en dB puis normalisés par les statistiques du jeu d'entraînement
-            (moyenne −30,82 dB, écart-type 12,15 dB pour NoisyCarDetector ; valeurs à
-            vérifier pour CarDetector).
+            (NoisyCarDetector : µ = −30,82 dB, σ = 12,15 dB ;
+            CarDetector : µ = −30,13 dB, σ = 11,87 dB).
           </p>
-          <!-- NOTE: ces chiffres proviennent des accordéons de l'ancienne page — à confirmer par l'auteur -->
         </div>
       </section>
 
@@ -183,12 +182,12 @@ import { CommonModule } from '@angular/common';
 
             <div class="train-row">
               <dt>Architecture NoisyCarDetector</dt>
-              <dd>CNN — 4 blocs Conv2D (32 → 64 → 128 → 256 filtres), BatchNorm + Dropout progressif (0,2 → 0,4), Global Average Pooling, Dense (128) → Sigmoid</dd>
+              <dd>CNN — 4 blocs Conv2D (32 → 64 → 128 → 256 filtres), BatchNorm + Dropout 0,25 (conv) / 0,5 (Dense), Global Average Pooling, Dense (128) → Sigmoid</dd>
             </div>
 
             <div class="train-row">
               <dt>Optimiseur</dt>
-              <dd>Adam, learning rate 1 × 10⁻³</dd>
+              <dd>Adam, learning rate 5 × 10⁻⁴ — réduction ×0,5 sur plateau (patience 4)</dd>
             </div>
 
             <div class="train-row">
@@ -198,7 +197,7 @@ import { CommonModule } from '@angular/common';
 
             <div class="train-row">
               <dt>Époques</dt>
-              <dd>Jusqu'à 100, avec early stopping (patience = 10)</dd>
+              <dd>Jusqu'à 100, avec early stopping (patience = 8)</dd>
             </div>
 
             <div class="train-row">
