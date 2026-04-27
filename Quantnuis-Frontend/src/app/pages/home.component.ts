@@ -657,9 +657,9 @@ export class HomeComponent implements AfterViewInit {
   citationText = CITATION_TEXT;
 
   pipelineSteps: PipelineStep[] = [
-    { id: 'upload', label: 'Reception du fichier audio', icon: '', status: 'waiting' },
+    { id: 'upload', label: 'Réception du fichier audio', icon: '', status: 'waiting' },
     { id: 'extract', label: 'Calcul du spectrogramme mel', icon: '', status: 'waiting' },
-    { id: 'car', label: 'Detection de vehicule (IA #1)', icon: '', status: 'waiting' },
+    { id: 'car', label: 'Détection de véhicule (IA #1)', icon: '', status: 'waiting' },
     { id: 'noise', label: 'Analyse du niveau sonore (IA #2)', icon: '', status: 'waiting' },
     { id: 'result', label: 'Classification finale', icon: '', status: 'waiting' }
   ];
@@ -775,9 +775,9 @@ export class HomeComponent implements AfterViewInit {
     this.pipelineSteps[1].status = 'completed';
     this.pipelineSteps[1].result = 'Spectrogramme mel extrait';
     this.pipelineSteps[2].status = 'completed';
-    this.pipelineSteps[2].result = res.carDetected ? 'Vehicule detecte' : 'Aucun vehicule';
+    this.pipelineSteps[2].result = res.carDetected ? 'Véhicule détecté' : 'Aucun véhicule';
     this.pipelineSteps[3].status = 'completed';
-    this.pipelineSteps[3].result = 'Niveau sonore classe';
+    this.pipelineSteps[3].result = 'Niveau sonore classé';
     this.pipelineSteps[4].status = 'completed';
     this.pipelineSteps[4].result = res.hasNoisyVehicle ? 'BRUYANT' : 'CONFORME';
     this.pipelineSteps = [...this.pipelineSteps];

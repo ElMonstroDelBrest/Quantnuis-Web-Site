@@ -17,13 +17,13 @@ export interface PipelineStep {
     <div class="pipeline-section">
       <div class="pipeline-header">
         <span class="pipeline-badge" [class.done]="!isAnalyzing">
-          {{ !isAnalyzing ? 'Termine' : 'En cours' }}
+          {{ !isAnalyzing ? 'Terminé' : 'En cours' }}
         </span>
-        <h2>{{ !isAnalyzing ? 'Analyse terminee' : 'Analyse en cours...' }}</h2>
+        <h2>{{ !isAnalyzing ? 'Analyse terminée' : 'Analyse en cours...' }}</h2>
         <p class="pipeline-filename" *ngIf="fileName">{{ fileName }}</p>
       </div>
 
-      <div class="pipeline-steps" role="list" aria-label="Etapes de l'analyse">
+      <div class="pipeline-steps" role="list" aria-label="Étapes de l'analyse">
         <div
           *ngFor="let step of steps; let i = index; let last = last; trackBy: trackByIndex"
           class="step-row"

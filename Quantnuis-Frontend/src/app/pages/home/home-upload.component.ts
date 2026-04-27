@@ -264,8 +264,8 @@ export class HomeUploadComponent {
     const fileName = file.name.toLowerCase();
     const hasValidExtension = this.ALLOWED_EXTENSIONS.some(ext => fileName.endsWith(ext));
 
-    if (!hasValidExtension) { alert('Extension non autorisee. Formats acceptes: WAV, MP3, M4A'); return; }
-    if (!file.type.startsWith('audio/')) { alert('Type de fichier non autorise. Veuillez selectionner un fichier audio.'); return; }
+    if (!hasValidExtension) { alert('Extension non autorisée. Formats acceptés : WAV, MP3, M4A'); return; }
+    if (!file.type.startsWith('audio/')) { alert('Type de fichier non autorisé. Veuillez sélectionner un fichier audio.'); return; }
     if (file.size > this.MAX_FILE_SIZE) { alert('Fichier trop volumineux. Taille maximale: 10 MB'); return; }
     if (file.size === 0) { alert('Le fichier est vide.'); return; }
 
