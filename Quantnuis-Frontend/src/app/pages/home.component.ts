@@ -36,12 +36,11 @@ const CITATION_TEXT = `@misc{quantnuis2026,
             Un pipeline à deux étages pour mesurer le bruit des véhicules en ville.
           </h2>
           <p class="editorial-prose">
-            L'exposition continue au bruit routier constitue un problème de santé publique.
-            Le décret n° 2022-125 fixe un seuil de 85 dB à deux mètres pour les véhicules en
-            circulation, mais les mesures restent ponctuelles et manuelles. Quantnuis automatise
-            la détection à partir d'audio urbain via deux réseaux de neurones : un premier modèle
-            isole les extraits contenant un véhicule, un second estime si le niveau sonore dépasse
-            le seuil réglementaire.
+            L'exposition continue au bruit routier constitue un problème de santé publique documenté.
+            Quantnuis automatise la détection de véhicules bruyants à partir d'enregistrements audio
+            via un pipeline à deux modèles en cascade : un premier réseau de neurones (CarDetector CRNN)
+            isole les extraits contenant un véhicule, un second (NoisyCarDetector CNN) estime si son
+            niveau sonore dépasse le seuil réglementaire de 85 dB.
           </p>
         </div>
       </section>
@@ -141,11 +140,11 @@ const CITATION_TEXT = `@misc{quantnuis2026,
             </div>
             <div class="stat">
               <dt>Features extraites</dt>
-              <dd>180<span class="stat-unit">→ 40 optimisées</span></dd>
+              <dd>180<span class="stat-unit">→ 12 optimisées</span></dd>
             </div>
             <div class="stat">
-              <dt>Précision validation</dt>
-              <dd>94 %<span class="stat-unit">sur jeu de test</span></dd>
+              <dt>F1-score NoisyCarDetector</dt>
+              <dd>94.8 %<span class="stat-unit">sur jeu de test</span></dd>
             </div>
             <div class="stat">
               <dt>Latence d'inférence</dt>
