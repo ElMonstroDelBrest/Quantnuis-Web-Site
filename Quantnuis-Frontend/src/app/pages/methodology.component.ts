@@ -230,11 +230,11 @@ import { CommonModule } from '@angular/common';
           <span class="section-label">§M6 · Évaluation</span>
           <h2 id="evaluation-heading">Métriques de performance.</h2>
           <p class="editorial-prose">
-            Les métriques ci-dessous sont mesurées en validation croisée 5 folds sur le
-            jeu de test de chaque modèle, avec le seuil de décision par défaut à 0,5.
+            Les métriques ci-dessous sont issues du rapport final (jeu de test, seuil de décision 0,5).
+            Le F1 du CarDetector est mesuré en validation croisée 5 folds ; celui du NoisyCarDetector
+            est évalué sur le jeu de test non augmenté.
           </p>
 
-          <!-- NOTE: valeurs placeholders — à remplacer par les résultats définitifs -->
           <table class="paper-table metrics-table" aria-label="Métriques de performance des modèles">
             <thead>
               <tr>
@@ -248,25 +248,23 @@ import { CommonModule } from '@angular/common';
             <tbody>
               <tr>
                 <td>CarDetector</td>
-                <!-- placeholder -->
                 <td>—</td>
                 <td>—</td>
-                <td>0,73 ± 0,03</td>
+                <td>0,733 ± 0,032</td>
                 <td>0,5</td>
               </tr>
               <tr>
                 <td>NoisyCarDetector</td>
-                <!-- placeholder -->
                 <td>—</td>
                 <td>—</td>
-                <td>0,99 ± 0,001</td>
+                <td>0,948</td>
                 <td>0,5</td>
               </tr>
             </tbody>
           </table>
           <p class="table-note">
-            Précision et rappel individuels à compléter. Les scores F1 ci-dessus proviennent
-            de la validation croisée 5 folds (valeurs à confirmer par l'auteur).
+            Source : N. Boué et al., <em>Projet Quantnuis</em>, ENSTA Bretagne, 2026.
+            Précision et rappel détaillés disponibles dans le rapport complet.
           </p>
         </div>
       </section>
