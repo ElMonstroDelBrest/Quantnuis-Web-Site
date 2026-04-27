@@ -127,10 +127,102 @@ const CITATION_TEXT = `@misc{quantnuis2026,
         </div>
       </section>
 
-      <!-- §4 — Mesures -->
+      <!-- §4 — Architecture -->
+      <section class="paper-section" aria-labelledby="arch-heading">
+        <div class="paper-section-inner">
+          <span class="section-label">§4 · Architecture</span>
+          <h2 id="arch-heading">Deux modèles complémentaires en cascade.</h2>
+          <p class="editorial-prose arch-intro">
+            Les deux réseaux opèrent sur un mel-spectrogramme 128 × 173 extrait du signal audio.
+            Le CarDetector filtre les segments sans véhicule ; le NoisyCarDetector évalue le niveau
+            sonore des segments retenus.
+          </p>
+
+          <div class="arch-grid">
+
+            <!-- CRNN -->
+            <div class="arch-col">
+              <div class="arch-col-header">
+                <span class="arch-col-name">CarDetector</span>
+                <span class="arch-badge arch-badge--crnn">CRNN</span>
+              </div>
+              <span class="arch-col-params">≈ 476 289 paramètres · F1 = 0.733</span>
+              <div class="arch-stack">
+                <div class="arch-layer arch-layer--input">
+                  <span class="arch-layer-label">Entrée</span>
+                  <span class="arch-layer-shape">128 × 173 × 1</span>
+                </div>
+                <div class="arch-connector"></div>
+                <div class="arch-block">
+                  <div class="arch-layer arch-layer--conv">Conv2D 16 · BN · ReLU</div>
+                  <div class="arch-layer arch-layer--pool">MaxPool 2×2 · Dropout 0.2</div>
+                </div>
+                <div class="arch-connector"></div>
+                <div class="arch-block">
+                  <div class="arch-layer arch-layer--conv">Conv2D 32 · BN · ReLU</div>
+                  <div class="arch-layer arch-layer--pool">MaxPool 2×2 · Dropout 0.2</div>
+                </div>
+                <div class="arch-connector"></div>
+                <div class="arch-block">
+                  <div class="arch-layer arch-layer--conv">Conv2D 64 · BN · ReLU</div>
+                  <div class="arch-layer arch-layer--pool">MaxPool 2×2 · Dropout 0.2</div>
+                </div>
+                <div class="arch-connector"></div>
+                <div class="arch-layer arch-layer--gru">Reshape → GRU 128 · Dropout 0.3</div>
+                <div class="arch-connector"></div>
+                <div class="arch-layer arch-layer--dense">Dense 64 · Dropout 0.2</div>
+                <div class="arch-connector"></div>
+                <div class="arch-layer arch-layer--output">Dense 1 · Sigmoïde</div>
+              </div>
+            </div>
+
+            <!-- CNN -->
+            <div class="arch-col">
+              <div class="arch-col-header">
+                <span class="arch-col-name">NoisyCarDetector</span>
+                <span class="arch-badge arch-badge--cnn">CNN</span>
+              </div>
+              <span class="arch-col-params">≈ 423 297 paramètres · F1 = 0.948</span>
+              <div class="arch-stack">
+                <div class="arch-layer arch-layer--input">
+                  <span class="arch-layer-label">Entrée</span>
+                  <span class="arch-layer-shape">128 × 173 × 1</span>
+                </div>
+                <div class="arch-connector"></div>
+                <div class="arch-block">
+                  <div class="arch-layer arch-layer--conv">Conv2D 32 · BN · ReLU</div>
+                  <div class="arch-layer arch-layer--pool">MaxPool 2×2 · Dropout 0.25</div>
+                </div>
+                <div class="arch-connector"></div>
+                <div class="arch-block">
+                  <div class="arch-layer arch-layer--conv">Conv2D 64 · BN · ReLU</div>
+                  <div class="arch-layer arch-layer--pool">MaxPool 2×2 · Dropout 0.25</div>
+                </div>
+                <div class="arch-connector"></div>
+                <div class="arch-block">
+                  <div class="arch-layer arch-layer--conv">Conv2D 128 · BN · ReLU</div>
+                  <div class="arch-layer arch-layer--pool">MaxPool 2×2 · Dropout 0.25</div>
+                </div>
+                <div class="arch-connector"></div>
+                <div class="arch-block">
+                  <div class="arch-layer arch-layer--conv">Conv2D 256 · BN · ReLU</div>
+                  <div class="arch-layer arch-layer--pool">GlobalAvgPool · Dropout 0.5</div>
+                </div>
+                <div class="arch-connector"></div>
+                <div class="arch-layer arch-layer--dense">Dense 128 · BN · Dropout 0.5</div>
+                <div class="arch-connector"></div>
+                <div class="arch-layer arch-layer--output">Dense 1 · Sigmoïde</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- §5 — Mesures -->
       <section class="paper-section" aria-labelledby="stats-heading">
         <div class="paper-section-inner">
-          <span class="section-label">§4 · Mesures</span>
+          <span class="section-label">§5 · Mesures</span>
           <h2 id="stats-heading">Chiffres clés.</h2>
 
           <dl class="context-stats" aria-label="Chiffres clés">
@@ -154,10 +246,10 @@ const CITATION_TEXT = `@misc{quantnuis2026,
         </div>
       </section>
 
-      <!-- §5 — Citation -->
+      <!-- §6 — Citation -->
       <section class="paper-section" aria-labelledby="citation-heading">
         <div class="paper-section-inner">
-          <span class="section-label">§5 · Citation</span>
+          <span class="section-label">§6 · Citation</span>
           <h2 id="citation-heading">Référencer ce projet.</h2>
 
           <div class="citation-block">
@@ -404,6 +496,153 @@ const CITATION_TEXT = `@misc{quantnuis2026,
         white-space: pre-wrap;
         word-break: break-word;
       }
+      .arch-grid { grid-template-columns: 1fr; gap: 2rem; }
+    }
+
+    /* ===== ARCHITECTURE DIAGRAM ===== */
+    .arch-intro { margin-bottom: 2.5rem; }
+
+    .arch-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2.5rem;
+      max-width: 680px;
+    }
+
+    .arch-col { display: flex; flex-direction: column; }
+
+    .arch-col-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .arch-col-name {
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .arch-badge {
+      font-family: ui-monospace, 'Cascadia Code', monospace;
+      font-size: 0.63rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      padding: 0.15rem 0.45rem;
+      border-radius: 3px;
+    }
+
+    .arch-badge--crnn {
+      background: color-mix(in srgb, #8b5cf6 12%, transparent);
+      color: #a78bfa;
+      border: 1px solid color-mix(in srgb, #8b5cf6 28%, transparent);
+    }
+
+    .arch-badge--cnn {
+      background: color-mix(in srgb, var(--accent) 12%, transparent);
+      color: var(--accent);
+      border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
+    }
+
+    .arch-col-params {
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 0.68rem;
+      color: var(--text-tertiary);
+      margin-bottom: 1.25rem;
+      display: block;
+    }
+
+    .arch-stack { display: flex; flex-direction: column; align-items: stretch; }
+
+    .arch-layer {
+      display: flex;
+      align-items: center;
+      padding: 0.42rem 0.75rem;
+      border-radius: 4px;
+      font-family: ui-monospace, 'Cascadia Code', monospace;
+      font-size: 0.7rem;
+      font-weight: 500;
+    }
+
+    .arch-layer--input {
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      justify-content: space-between;
+    }
+    .arch-layer-label {
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 0.6rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: var(--text-tertiary);
+    }
+    .arch-layer-shape {
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+    }
+
+    .arch-block { display: flex; flex-direction: column; }
+    .arch-block .arch-layer--conv { border-radius: 4px 4px 0 0; }
+
+    .arch-layer--conv {
+      background: color-mix(in srgb, var(--accent) 8%, transparent);
+      border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
+      color: color-mix(in srgb, var(--accent) 88%, white);
+      justify-content: center;
+    }
+
+    .arch-layer--pool {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      border-top: none;
+      border-radius: 0 0 4px 4px;
+      color: var(--text-tertiary);
+      font-size: 0.65rem;
+      justify-content: center;
+    }
+
+    .arch-layer--gru {
+      background: color-mix(in srgb, #8b5cf6 8%, transparent);
+      border: 1px solid color-mix(in srgb, #8b5cf6 22%, transparent);
+      color: #a78bfa;
+      justify-content: center;
+    }
+
+    .arch-layer--dense {
+      background: color-mix(in srgb, var(--success) 8%, transparent);
+      border: 1px solid color-mix(in srgb, var(--success) 22%, transparent);
+      color: color-mix(in srgb, var(--success) 88%, white);
+      justify-content: center;
+    }
+
+    .arch-layer--output {
+      background: color-mix(in srgb, var(--accent) 14%, transparent);
+      border: 1px solid color-mix(in srgb, var(--accent) 38%, transparent);
+      color: var(--accent);
+      font-weight: 700;
+      justify-content: center;
+    }
+
+    .arch-connector {
+      width: 1px;
+      height: 10px;
+      background: var(--border-color);
+      margin: 0 auto;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .arch-connector::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: -2.5px;
+      border-left: 3px solid transparent;
+      border-right: 3px solid transparent;
+      border-top: 4px solid var(--border-color);
     }
   `]
 })
